@@ -28,7 +28,7 @@ Responsibilities Breakedown
 Iteration 1
 Name	Role
 Mincky Feng	TODO
-Chang Liu	TODO
-Zhi Qiao	TODO
+Dennis Liu	TODO
+Zhi Qiao	Elevator raw data acquirement
 Xucheng Shi	TODO
-Frank Xu	TODO
+Frank Xu	Project management
