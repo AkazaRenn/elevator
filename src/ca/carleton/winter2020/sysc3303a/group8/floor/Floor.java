@@ -20,7 +20,7 @@ public class Floor {
 		FLOORSYS = floorsys;
 		floorNum = floor;
 		UPBUTTON = new FloorButton(this,Direction.UP);
-		UPBUTTON = new FloorButton(this,Direction.DOWN);
+		DOWNBUTTON = new FloorButton(this,Direction.DOWN);
 	}	
 	
 	public int getFloorNum() { 
