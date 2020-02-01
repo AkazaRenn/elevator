@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-class FloorSubsystemTest {
+public class FloorSubsystemTest {
 
     @Test
     void test() {

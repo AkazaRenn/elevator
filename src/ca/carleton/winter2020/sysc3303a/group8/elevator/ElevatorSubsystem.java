@@ -48,6 +48,27 @@ public class ElevatorSubsystem extends Thread {
     }
 
     /**
+     * Control the motor to move the car up
+     */
+    public void moveUp() {
+        MOTOR.moveUp();
+    }
+
+    /**
+     * Control the motor to move the car down
+     */
+    public void moveDown() {
+        MOTOR.moveDown();
+    }
+
+    /**
+     * Control the motor to stop the car
+     */
+    public void stopMoving() {
+        MOTOR.stop();
+    }
+
+    /**
      * From the schedule update the current floor the elevator is at
      * 
      * @return the current floor the elevator is at
