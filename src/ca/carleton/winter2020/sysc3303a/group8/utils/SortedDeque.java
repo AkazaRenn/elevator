@@ -25,16 +25,23 @@ public class SortedDeque<T> extends TreeSet<T> implements Deque<T> {
 
     @Override
     public T element() {
-        T element = first();
-        if(element == null) {
+        if(isEmpty()) {
             throw new NoSuchElementException();
         }
-        return element;
+        return first();
     }
 
     @Override
     public T getFirst() {
         return pollFirst();
+    }
+    
+    public T getHigher(T e) {
+        return higher(e);
+    }
+    
+    public T getLower(T e) {
+        return lower(e);
     }
 
     @Override
@@ -90,32 +97,33 @@ public class SortedDeque<T> extends TreeSet<T> implements Deque<T> {
 
     @Override
     public T remove() {
-        // TODO Auto-generated method stub
-        return null;
+        return removeFirst();
     }
 
     @Override
     public T removeFirst() {
-        // TODO Auto-generated method stub
-        return null;
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return pollFirst();
     }
 
     @Override
     public boolean removeFirstOccurrence(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        return remove(o);
     }
 
     @Override
     public T removeLast() {
-        // TODO Auto-generated method stub
-        return null;
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return pollLast();
     }
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        return remove(o);
     }
 
 
