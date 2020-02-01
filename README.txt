@@ -28,7 +28,7 @@ Responsibilities Breakedown
 Iteration 1
 Name	Role
 Mincky Feng	TODO
-Dennis Liu	TODO
-Zhi Qiao	Elevator raw data acquirement
-Xucheng Shi	TODO
-Frank Xu	Project management
+Dennis Liu	Scheduler and floor subsystems development
+Zhi Qiao	Elevator raw data acquirement, floor subsystem development
+Xucheng Shi	Class diagram skectching
+Frank Xu	Project management, elevator and scheduler subsystems development

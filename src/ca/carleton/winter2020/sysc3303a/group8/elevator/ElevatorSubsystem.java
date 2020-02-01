@@ -23,8 +23,6 @@ public class ElevatorSubsystem extends Thread {
     public final ElevatorDoor DOOR;
 
     private int currentFloor;
-    private SortedDeque<Integer> upQueue;
-    private SortedDeque<Integer> downQueue;
     
     public ElevatorSubsystem(Scheduler scheduler, int elevatorId, int bottomFloor, int topFloor) {
         SCHEDULER = scheduler;
@@ -39,36 +37,6 @@ public class ElevatorSubsystem extends Thread {
         DOOR = new ElevatorDoor(this);
         
         currentFloor = 1;
-        upQueue = new SortedDeque<>();
-        downQueue = new SortedDeque<>();
-    }
-    
-    /**
-     * Add a stop ignoring the direction, used for users inside the elevator to
-     * leave at specific floor.
-     * 
-     * @param floor floor where the user wants to leave
-     */
-    public synchronized void addStop(int floor) {
-        if(floor > currentFloor) {
-            upQueue.add(floor);
-        } else if (floor < currentFloor) {
-            downQueue.add(floor);
-        }
-    }
-    
-    /**
-     * Add a stop depending on the direction.
-     * 
-     * @param direction direction where the user wants to go
-     * @param floor floor where the user is at
-     */
-    public synchronized void addStop(Direction direction, int floor) {
-        if(direction == Direction.UP) {
-            upQueue.add(floor);
-        } else if(direction == Direction.DOWN) {
-            downQueue.add(floor);
-        }
     }
     
     /**
@@ -94,38 +62,21 @@ public class ElevatorSubsystem extends Thread {
      * 
      * @return the current floor the elevator is at
      */
-    private int updateCurrentFloor() {
-        //TODO acquire mutex for the current floor it is at from the scheduler
+    public int updateCurrentFloor(int floorNumber) {
         BUTTONS.get(currentFloor - BOTTOM_FLOOR).floorArrived();
-        return 1;
-    }
-    
-    /**
-     * Calculate the next floor the elevator will be arriving at in preparation 
-     * of stops
-     * 
-     * @return next floor the elevator will be arriving at
-     */
-    private int getNextFloor() {
-        if(getDirection() == Direction.UP) {
-            return currentFloor + 1;
-        } else if(getDirection() == Direction.DOWN) {
-            return currentFloor - 1;
-        }
-        return currentFloor;
+        return floorNumber;
     }
 
-    @Override
-    public void run() {
-        updateCurrentFloor();
-        if((getDirection() == Direction.UP && getNextFloor() == upQueue.getHigher(currentFloor)) ||
-                (getDirection() == Direction.DOWN && getNextFloor() == downQueue.getLower(currentFloor))) {
-            MOTOR.stop();
-            DOOR.open();
-        } else if(upQueue.getHigher(currentFloor) != null) {
-                MOTOR.moveUp();
-        } else if(downQueue.getLower(currentFloor) != null) {
-                MOTOR.moveDown();
-        }
-    }
+    // @Override
+    // public void run() {
+    //     if((getDirection() == Direction.UP && getNextFloor() == upQueue.getHigher(currentFloor)) ||
+    //             (getDirection() == Direction.DOWN && getNextFloor() == downQueue.getLower(currentFloor))) {
+    //         MOTOR.stop();
+    //         DOOR.open();
+    //     } else if(upQueue.getHigher(currentFloor) != null) {
+    //             MOTOR.moveUp();
+    //     } else if(downQueue.getLower(currentFloor) != null) {
+    //             MOTOR.moveDown();
+    //     }
+    // }
 }
