@@ -44,6 +44,14 @@ public class Scheduler extends Thread {
 	public void addStop(int elevatorId, int floor, Direction direction) {
 		ELEVATORS.get(elevatorId).addStop(direction, floor);
 	}
+	
+	public void setfloorLamp() {
+		for (i = MIN_FLOOR; i < MAX_FLOOR; i++){
+			FLOORSYS.get(i).setFloorLamp(ELEVATORS.get(elevatorId).getCurrentFloor());
+			FLOORSYS.get(i).setDirecionLamp(ELEVATORS.get(elevatorId).getDirection());
+		}
+	}
+	
 
 	@Override
 	public void run() {

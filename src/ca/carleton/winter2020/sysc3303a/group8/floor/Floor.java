@@ -7,14 +7,14 @@ public class Floor {
 	public FloorSubsystem FLOORSYS;
 	
 	int floorNum;
+	int floorLamp;
+	
 	boolean moving;
 	boolean upLamp = false;
 	boolean downLamp = false;
 	
 	public FloorButton UPBUTTON;
 	public FloorButton DOWNBUTTON;
-	
-	Direction moveDirection;
 	
 	public Floor(FloorSubsystem floorsys,int floor) {
 		FLOORSYS = floorsys;
@@ -31,17 +31,23 @@ public class Floor {
 		FLOORSYS.sendStop(direction,floorNum);
 	}
 	
-	public void setLamp() { 
-		if (moving && moveDirection==Direction.UP) {
+	public void setFloorLamp(int elevatorCurrentFloor) {
+		floorLamp = elevatorCurrentFloor;
+	}
+	
+	public void setDirecionLamp(Direction elevatorMoveDirection) { 
+		if (elevatorMoveDirection==Direction.UP) {
 			upLamp = true; 
 			downLamp = false;
-		}else if(moving && moveDirection==Direction.DOWN) {
+		}else if(elevatorMoveDirection==Direction.DOWN) {
 			upLamp = false;
 			downLamp = true;
-		}else if(!moving && moveDirection==Direction.HOLD) {
+		}else if(elevatorMoveDirection==Direction.HOLD) {
 			upLamp = false;
 			downLamp = false;
 		}
+		
+	
 		
 	}
 
