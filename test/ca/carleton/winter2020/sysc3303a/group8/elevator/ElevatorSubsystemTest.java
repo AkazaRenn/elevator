@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
-public class ElevatorSubsystemTest {
+class ElevatorSubsystemTest {
 
     private static final int ELEVATOR_ID = 1;
     private static final int BOTTOM_FLOOR = -2;
@@ -16,12 +16,12 @@ public class ElevatorSubsystemTest {
     private ElevatorSubsystem elevator;
     
     @BeforeEach
-    public void setup() {
+    void setup() {
         elevator = new ElevatorSubsystem(null, ELEVATOR_ID, BOTTOM_FLOOR, TOP_FLOOR);
     }
 
     @Test
-    public void getAndChangeDirection() {
+    void getAndChangeDirection() {
         assertEquals(elevator.getDirection(), Direction.HOLD);
         elevator.moveUp();
         assertEquals(elevator.getDirection(), Direction.UP);

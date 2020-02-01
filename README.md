@@ -14,25 +14,28 @@ Description of the project as a Markdown source file.
 
 Specifictions of the elevator simulated, including its speed, accleration, etc.
 
-### class_diagram.vsdx
+### class_diagram.png
 
 UML class diagram of the project.
 
-### sequence_diagram.vsdx
+### sequence_diagram.png
 
 UML sequence diagram of the project.
 
-### Everything else
+### src\
+Source codes of the project.
 
-Eclipse project files and Java source codes of it.
+### test\
+Test codes of the project.
 
 ## Setup Instructions
 
-TODO
+1. Open Eclipse Java IDE
+2. From menu bar choose File -> Open Projects from File System... -> click Directory... button and find the directory of the project -> click Finish button
 
 ## Test Instructions
 
-TODO
+Right-click the tests to be executed in the Package Explorer and choose Run As -> JUnit Test
 
 ## Responsibilities Breakedown
 
@@ -40,7 +43,7 @@ TODO
 
 Name|Role 
 ---|---
-Mincky Feng|TODO
+Mincky Feng|
 Dennis Liu|Scheduler and floor subsystems development
 Zhi Qiao|Elevator raw data acquirement, floor subsystem development
 Xucheng Shi|Class diagram skectching
