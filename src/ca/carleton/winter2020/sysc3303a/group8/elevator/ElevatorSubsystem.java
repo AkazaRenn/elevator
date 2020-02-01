@@ -7,6 +7,11 @@ import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 import ca.carleton.winter2020.sysc3303a.group8.utils.SortedDeque;
 
+/**
+ * Elevator subsystem of the project.
+ * 
+ * @author Frank Xu 101050120
+ */
 public class ElevatorSubsystem extends Thread {
 
     public final Scheduler SCHEDULER;
@@ -17,6 +22,7 @@ public class ElevatorSubsystem extends Thread {
     public final List<ElevatorButton> BUTTONS;
     public final ElevatorDoor DOOR;
 
+    private int currentFloor;
     private SortedDeque<Integer> upQueue;
     private SortedDeque<Integer> downQueue;
     
@@ -32,18 +38,31 @@ public class ElevatorSubsystem extends Thread {
         }
         DOOR = new ElevatorDoor(this);
         
+        currentFloor = 1;
         upQueue = new SortedDeque<>();
         downQueue = new SortedDeque<>();
     }
     
+    /**
+     * Add a stop ignoring the direction, used for users inside the elevator to
+     * leave at specific floor.
+     * 
+     * @param floor floor where the user wants to leave
+     */
     public synchronized void addStop(int floor) {
-        if(floor > getCurrentFloor() && getDirection() == Direction.UP) {
+        if(floor > currentFloor) {
             upQueue.add(floor);
-        } else if (floor < getCurrentFloor() && getDirection() == Direction.DOWN) {
+        } else if (floor < currentFloor) {
             downQueue.add(floor);
         }
     }
     
+    /**
+     * Add a stop depending on the direction.
+     * 
+     * @param direction direction where the user wants to go
+     * @param floor floor where the user is at
+     */
     public synchronized void addStop(Direction direction, int floor) {
         if(direction == Direction.UP) {
             upQueue.add(floor);
@@ -52,47 +71,61 @@ public class ElevatorSubsystem extends Thread {
         }
     }
     
+    /**
+     * Return the direction of the elevator
+     * 
+     * @return the direction of the elevator
+     */
     public Direction getDirection() {
         return MOTOR.getDirection();
     }
     
+    /**
+     * Press a button to floorNumber inside the elevator
+     * 
+     * @param floorNumber floor where the button indicates
+     */
     public void pressButton(int floorNumber) {
-        BUTTONS.get(floorNumber - BOTTOM_FLOOR).pressButton();
-    }
-    
-    public synchronized void arriveAtFloor(int floorNumber) {
-        BUTTONS.get(floorNumber - BOTTOM_FLOOR).floorArrived();
+        BUTTONS.get(floorNumber - BOTTOM_FLOOR).press();
     }
 
     /**
-     * @return the currentFloor
+     * From the schedule update the current floor the elevator is at
+     * 
+     * @return the current floor the elevator is at
      */
-    public int getCurrentFloor() {
+    private int updateCurrentFloor() {
         //TODO acquire mutex for the current floor it is at from the scheduler
+        BUTTONS.get(currentFloor - BOTTOM_FLOOR).floorArrived();
         return 1;
     }
     
+    /**
+     * Calculate the next floor the elevator will be arriving at in preparation 
+     * of stops
+     * 
+     * @return next floor the elevator will be arriving at
+     */
     private int getNextFloor() {
         if(getDirection() == Direction.UP) {
-            return getCurrentFloor() + 1;
+            return currentFloor + 1;
         } else if(getDirection() == Direction.DOWN) {
-            return getCurrentFloor() - 1;
+            return currentFloor - 1;
         }
-        return getCurrentFloor();
+        return currentFloor;
     }
 
     @Override
     public void run() {
-        int currentFloor = getCurrentFloor();
+        updateCurrentFloor();
         if((getDirection() == Direction.UP && getNextFloor() == upQueue.getHigher(currentFloor)) ||
                 (getDirection() == Direction.DOWN && getNextFloor() == downQueue.getLower(currentFloor))) {
             MOTOR.stop();
-        } else if(getDirection() == Direction.HOLD) {
-            if(!upQueue.isEmpty()) {
+            DOOR.open();
+        } else if(upQueue.getHigher(currentFloor) != null) {
                 MOTOR.moveUp();
-            } else if(!downQueue.isEmpty()) {
+        } else if(downQueue.getLower(currentFloor) != null) {
                 MOTOR.moveDown();
-            }
         }
     }
 }

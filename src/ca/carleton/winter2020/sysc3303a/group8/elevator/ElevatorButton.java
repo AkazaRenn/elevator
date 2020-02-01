@@ -1,5 +1,10 @@
 package ca.carleton.winter2020.sysc3303a.group8.elevator;
 
+/**
+ * Button in the elevator system deciding which floor the elevator would stop at
+ * 
+ * @author Frank Xu 101050120
+ */
 public class ElevatorButton {
     
     public final String BUTTON_TEXT;
@@ -20,19 +25,30 @@ public class ElevatorButton {
         this(((Integer)floorNumber).toString(), elevator, floorNumber);
     }
     
-    public void pressButton() {
+    /**
+     * Press the button
+     */
+    public void press() {
         if(!lampOn) {
             lampOn = true;
             ELEVATOR.addStop(FLOOR_NUMBER);
         }
     }
     
+    /**
+     * Turn off the lamp when arriving at the corresponding floor
+     */
     public void floorArrived() {
         if(lampOn) {
             lampOn = false;
         }
     }
     
+    /**
+     * Return whether the lamp of the button is on
+     * 
+     * @return whether the lamp of the button is on
+     */
     public boolean isLampOn() {
         return lampOn;
     }
