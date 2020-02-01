@@ -5,7 +5,6 @@ import java.util.List;
 
 import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
-import ca.carleton.winter2020.sysc3303a.group8.utils.SortedDeque;
 
 /**
  * Elevator subsystem of the project.
@@ -47,15 +46,6 @@ public class ElevatorSubsystem extends Thread {
     public Direction getDirection() {
         return MOTOR.getDirection();
     }
-    
-    /**
-     * Press a button to floorNumber inside the elevator
-     * 
-     * @param floorNumber floor where the button indicates
-     */
-    public void pressButton(int floorNumber) {
-        BUTTONS.get(floorNumber - BOTTOM_FLOOR).press();
-    }
 
     /**
      * From the schedule update the current floor the elevator is at
@@ -65,6 +55,14 @@ public class ElevatorSubsystem extends Thread {
     public int updateCurrentFloor(int floorNumber) {
         BUTTONS.get(currentFloor - BOTTOM_FLOOR).floorArrived();
         return floorNumber;
+    }
+
+    /**
+     * Add a stop to the queue of scheduler
+     */
+    public void addStop(int floor) {
+        SCHEDULER.addStop(ELEVATOR_ID, floor);
+        BUTTONS.get(floor - BOTTOM_FLOOR).turnOnLamp();
     }
 
     // @Override

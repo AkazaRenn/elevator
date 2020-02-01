@@ -30,8 +30,17 @@ public class ElevatorButton {
      */
     public void press() {
         if(!lampOn) {
-            lampOn = true;
             ELEVATOR.addStop(FLOOR_NUMBER);
+            lampOn = true;
+        }
+    }
+
+    /**
+     * Turn on the lamp of the button
+     */
+    public void turnOnLamp() {
+        if(!lampOn) {
+            lampOn = true;
         }
     }
     

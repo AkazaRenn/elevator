@@ -24,6 +24,10 @@ public class Elevator {
         downQueue = new SortedDeque<>();
     }
     
+    public Elevator(Scheduler scheduler, int elevatorId, int bottomFloor, int topFloor) {
+        this(new ElevatorSubsystem(scheduler, elevatorId, bottomFloor, topFloor));
+    }
+    
     /**
      * Add a stop ignoring the direction, used for users inside the elevator to
      * leave at specific floor.
