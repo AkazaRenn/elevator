@@ -16,8 +16,6 @@ public class Floor {
 	public FloorButton UPBUTTON;
 	public FloorButton DOWNBUTTON;
 	
-	Direction moveDirection;
-	
 	public Floor(FloorSubsystem floorsys,int floor) {
 		FLOORSYS = floorsys;
 		floorNum = floor;
@@ -41,15 +39,12 @@ public class Floor {
 		if (elevatorMoveDirection==Direction.UP) {
 			upLamp = true; 
 			downLamp = false;
-			moveDirection = elevatorMoveDirection;
 		}else if(elevatorMoveDirection==Direction.DOWN) {
 			upLamp = false;
 			downLamp = true;
-			moveDirection = elevatorMoveDirection;
 		}else if(elevatorMoveDirection==Direction.HOLD) {
 			upLamp = false;
 			downLamp = false;
-			moveDirection = elevatorMoveDirection;
 		}
 		
 	
