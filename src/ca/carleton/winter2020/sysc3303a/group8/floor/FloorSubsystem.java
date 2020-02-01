@@ -1,7 +1,9 @@
 package ca.carleton.winter2020.sysc3303a.group8.floor;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 /** FloorSubsystem.java
  * This class is the FloorSubsystem side for a simple echo server based on UDP/IP. 
@@ -19,14 +21,14 @@ public class FloorSubsystem {
 	int totalFloor = 7;
 
 	
-	Direction currentDirection = Direction.IDLE;
+	Direction currentDirection = Direction.HOLD;
 	
 	static ArrayList<Floor> floors;
 
 	public FloorSubsystem() {
 		floors = new ArrayList<Floor>();
 		for (int i = 0; i < totalFloor - 1; i++) {
-			floors.add(new Floor(i, false, Direction.IDLE));
+			floors.add(new Floor(i, false, Direction.HOLD));
 		}
 		
 	}

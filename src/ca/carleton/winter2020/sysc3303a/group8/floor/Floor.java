@@ -1,4 +1,6 @@
-package src;
+package ca.carleton.winter2020.sysc3303a.group8.floor;
+
+import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 public class Floor {
 	
@@ -10,12 +12,12 @@ public class Floor {
 	
 	Direction moveDirection;
 	
-	public Floor(int floor, boolean moving, Direction idle) {
+	public Floor(int floor, boolean moving, Direction direction) {
 		floorNum = floor;
 		this.moving = moving;
 		upLamp = false;
 		downLamp = false;
-		this.moveDirection = idle;
+		this.moveDirection = direction;
         
 	}	
 	
@@ -34,7 +36,7 @@ public class Floor {
 		}else if(moving && moveDirection==Direction.DOWN) {
 			upLamp = false;
 			downLamp = true;
-		}else if(!moving && moveDirection==Direction.IDLE) {
+		}else if(!moving && moveDirection==Direction.HOLD) {
 			upLamp = false;
 			downLamp = false;
 		}

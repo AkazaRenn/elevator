@@ -1,4 +1,6 @@
-package src;
+package ca.carleton.winter2020.sysc3303a.group8.floor;
+
+import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 public class FloorButton {
 
