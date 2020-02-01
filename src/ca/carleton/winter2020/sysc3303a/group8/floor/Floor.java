@@ -4,29 +4,31 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 public class Floor {
 	
+	public FloorSubsystem FLOORSYS;
+	
 	int floorNum;
 	boolean moving;
-	boolean upLamp;
-	boolean downLamp;
-	ButtonPanel Button = new ButtonPanel(floorNum);
+	boolean upLamp = false;
+	boolean downLamp = false;
+	
+	public FloorButton UPBUTTON;
+	public FloorButton DOWNBUTTON;
 	
 	Direction moveDirection;
 	
-	public Floor(int floor, boolean moving, Direction direction) {
+	public Floor(FloorSubsystem floorsys,int floor) {
+		FLOORSYS = floorsys;
 		floorNum = floor;
-		this.moving = moving;
-		upLamp = false;
-		downLamp = false;
-		this.moveDirection = direction;
-        
+		UPBUTTON = new FloorButton(this,Direction.UP);
+		UPBUTTON = new FloorButton(this,Direction.DOWN);
 	}	
 	
 	public int getFloorNum() { 
-		return(this.floorNum); 
+		return floorNum; 
 	}
 
-	public Direction getDirection() { 
-		return(this.moveDirection);
+	public void addStop(Direction direction) {
+		FLOORSYS.sendStop(direction,floorNum);
 	}
 	
 	public void setLamp() { 
