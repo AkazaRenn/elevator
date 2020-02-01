@@ -10,15 +10,19 @@ Description of the project as a text file.
 
 Description of the project as a Markdown source file.
 
+### README.pdf
+
+Description of the project as a Markdown source file.
+
 ### specs.xlsx
 
 Specifictions of the elevator simulated, including its speed, accleration, etc.
 
-### class_diagram.png
+### class_diagram.pdf
 
 UML class diagram of the project.
 
-### sequence_diagram.png
+### sequence_diagram.pdf
 
 UML sequence diagram of the project.
 
