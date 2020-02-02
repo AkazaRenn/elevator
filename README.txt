@@ -33,8 +33,8 @@ Right-click the tests to be executed in the Package Explorer and choose Run As -
 Responsibilities Breakedown
 Iteration 1
 Name	Role
-Mincky Feng	
+Mincky Feng	UML and Seqence diagram skectching
 Dennis Liu	Scheduler and floor subsystems development
 Zhi Qiao	Elevator raw data acquirement, floor subsystem development
-Xucheng Shi	Class diagram skectching
+Xucheng Shi	UML and Seqence diagram skectching
 Frank Xu	Project management, elevator and scheduler subsystems development
