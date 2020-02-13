@@ -1,7 +1,12 @@
 package ca.carleton.winter2020.sysc3303a.group8.floor;
 
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
-
+/**
+ * floor button
+ * 
+ * @author Zhi Qiao 101026761 
+ * @author Dennis Liu
+ */
 public class FloorButton {
 
 	private Floor FLOOR;
@@ -21,10 +26,11 @@ public class FloorButton {
 		return lampOn;
 	}
 	
-	public void press() {
+	public void press(Direction direction) {
         if(!lampOn) {
             lampOn = true;
             FLOOR.addStop(direction);
+            FLOOR.setDirecionLamp(direction);
         }
 	}
 }
