@@ -58,39 +58,47 @@ public class FloorSubsystem {
 	 */
 	public void ElevatorMoving(int currentFloor) {
 		for (Floor floor:floors){
-			if(floor.ElevatorArrive()) {
-				if(stopNum!= 0 ) { // arrive a stop but still other stop 
+			// arrive a floor
+			if(floor.getFloorNum() == currentFloor) {
+				floor.setFloorLamp(currentFloor);
+				System.out.println(String.format("arrive %s floor",currentFloor));
+			}
+			// Verify stop
+			if(floor.ElevatorArrive()&&floor.getFloorNum() == currentFloor) {
+				if(stopNum!= 1 ) { // arrive a stop but still other stop 
 					floor.setDirecionLamp(defaultDirection);
 					floor.setFloorLamp(currentFloor);
 					floor.notArrive();
+					System.out.println("move to next stop\n");
 					stopNum--;
-					FloorInfor();
-				}else { // arrive a stop and no more stop
+					
+					
+				}else if(stopNum == 1){ // arrive a stop and no more stop
 					floor.setDirecionLamp(defaultDirection);
 					floor.setFloorLamp(currentFloor);
 					floor.notArrive();
-					FloorInfor();
+					System.out.println("last stop\n");
+					stopNum--;
+					
 				}
 			} 
-			// not a stop
-			floor.setFloorLamp(currentFloor);
-			floor.notArrive();
+				
 		}
 	}
 	
-	public void FloorInfor() {
+	public void FloorInfor(int currentFloor) {
 		System.out.println("floor information: ");
 		for (Floor floor:floors){
 			System.out.print("current floor: ");
 			System.out.println(floor.getFloorNum());
 			System.out.print("floor lamp: ");
-			System.out.println(floor.getFloorLamp());
+			System.out.println(currentFloor);
 			if (floor.getUpLamp()) {
-				System.out.println("up lamp on\n");
+				System.out.println("up lamp on");
 			}else if(floor.getDownLamp()) {
-				System.out.println("down lamp on\n");
+				System.out.println("down lamp on");
 			}else {
-				System.out.println("no direction lamp on\n");
+				System.out.println("no direction lamp on");
 			}
 		}
 		System.out.println("end\n");
