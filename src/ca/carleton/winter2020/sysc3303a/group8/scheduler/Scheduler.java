@@ -25,7 +25,7 @@ public class Scheduler extends Thread {
         for(int id = 0; id < elevatorNumber; id++) {
             ELEVATORS.add(new Elevator(this,id,MIN_FLOOR,MAX_FLOOR));
         }
-        FLOORSYS = new FloorSubsystem(this,MIN_FLOOR,MAX_FLOOR);
+        FLOORSYS = new FloorSubsystem(MIN_FLOOR,MAX_FLOOR);
     }
     
     public void receiveStop(Direction direction, int floor) {

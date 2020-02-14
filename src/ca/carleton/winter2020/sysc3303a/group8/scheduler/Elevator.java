@@ -4,12 +4,14 @@ import ca.carleton.winter2020.sysc3303a.group8.elevator.ElevatorSubsystem;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 import ca.carleton.winter2020.sysc3303a.group8.utils.SortedDeque;
 
+
 /**
  * Structure containing data of a single elevator car
  * 
  * @author Frank Xu 101050120
  */
 public class Elevator {
+	
     private final ElevatorSubsystem ELEVATOR;
 
     private int currentFloor;
