@@ -13,7 +13,7 @@ public class Floor {
 	
 	public FloorSubsystem FLOORSYS;
 	
-	private static int floorNum;
+	private final int floorNum;
 	private int floorLamp;
 	
 	private boolean upLamp;
@@ -38,9 +38,16 @@ public class Floor {
 	public int getFloorNum() { 
 		return floorNum; 
 	}
-
-	public void addStop(Direction direction) {
-		FLOORSYS.setStop(direction,floorNum);
+	
+	public int getFloorLamp() { 
+		return floorLamp; 
+	}
+	
+	public boolean getUpLamp() { 
+		return upLamp; 
+	}
+	public boolean getDownLamp() { 
+		return downLamp; 
 	}
 	
 	public void setFloorLamp(int elevatorCurrentFloor) {
@@ -60,11 +67,16 @@ public class Floor {
 		}		
 	}
 	
+	public void ButtonPressed(FloorButton button) {
+		setDirecionLamp(button.getDirection());
+		FLOORSYS.setStop(button.getDirection(),floorNum);
+	}
+	
 	public void DetectArrive() {
 		this.ArriveSensor = true;
 	}
 	
-	public void ElevatorLeaving() {
+	public void notArrive() {
 		this.ArriveSensor = false;
 	}
 	

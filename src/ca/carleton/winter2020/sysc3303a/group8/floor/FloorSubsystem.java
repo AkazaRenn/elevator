@@ -2,7 +2,7 @@ package ca.carleton.winter2020.sysc3303a.group8.floor;
 
 import java.util.ArrayList;
 
-import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
+//import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 /** FloorSubsystem.java
@@ -20,51 +20,80 @@ public class FloorSubsystem {
 	int bottomFloor = 0;
 	int totalFloor = 7;
 
-    public final Scheduler SCHEDULER;
+    //private final Scheduler SCHEDULER;
     public final int BOTTOM_FLOOR;
     public final int TOP_FLOOR;
-    public int Stop;
-    private int stopNum;
+    private int stopNum = 0;
 	
-	Direction currentDirection = Direction.HOLD;
+	Direction defaultDirection = Direction.HOLD;
 	
 	public ArrayList<Floor> floors;
-
-	public FloorSubsystem(Scheduler scheduler, int bottomFloor, int topFloor) {
+//Scheduler scheduler,
+	public FloorSubsystem( int bottomFloor, int topFloor) {
 		//Send messages to this scheduler
-		SCHEDULER = scheduler;
+		//SCHEDULER = scheduler;
 		BOTTOM_FLOOR = bottomFloor;
 		TOP_FLOOR = topFloor;
 		stopNum = 0;
 		floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
         for(int i = bottomFloor; i <= topFloor; i++) {
         	floors.add(new Floor(this,i));
-        	floors.get(i).setDirecionLamp(currentDirection);
+        	floors.get(i).setDirecionLamp(defaultDirection);
         }
 		
 	}
-	
+	/*
+	 * set a stop floor for elevator
+	 */
 	public void setStop(Direction direction, int floorNum) {
-		SCHEDULER.receiveStop(direction, floorNum);
-		Stop = floorNum;
+		//SCHEDULER.receiveStop(direction, floorNum);
+		floors.get(floorNum).setDirecionLamp(direction);
+		floors.get(floorNum).DetectArrive();
 		stopNum++;
 	}
 	
-	public boolean ElevatorArrive() {
-		for (int i=bottomFloor; i<totalFloor;){
-			if(floors.get(i).ElevatorArrive()) {
-				if(stopNum!= 0 ) {
-					floors.get(i).setDirecionLamp(currentDirection);
+	/*
+	 * detecting whether the elevator arrives a floor
+	 * if arrives, set direction lamp and floor number lamp
+	 */
+	public void ElevatorMoving(int currentFloor) {
+		for (Floor floor:floors){
+			if(floor.ElevatorArrive()) {
+				if(stopNum!= 0 ) { // arrive a stop but still other stop 
+					floor.setDirecionLamp(defaultDirection);
+					floor.setFloorLamp(currentFloor);
+					floor.notArrive();
 					stopNum--;
-				}else {
-					floors.get(i).setDirecionLamp(Direction.HOLD);
+					FloorInfor();
+				}else { // arrive a stop and no more stop
+					floor.setDirecionLamp(defaultDirection);
+					floor.setFloorLamp(currentFloor);
+					floor.notArrive();
+					FloorInfor();
 				}
-				return true;
-			}
-			i++;
-			return false;
+			} 
+			// not a stop
+			floor.setFloorLamp(currentFloor);
+			floor.notArrive();
 		}
-		return false;
+	}
+	
+	public void FloorInfor() {
+		System.out.println("floor information: ");
+		for (Floor floor:floors){
+			System.out.print("current floor: ");
+			System.out.println(floor.getFloorNum());
+			System.out.print("floor lamp: ");
+			System.out.println(floor.getFloorLamp());
+			if (floor.getUpLamp()) {
+				System.out.println("up lamp on\n");
+			}else if(floor.getDownLamp()) {
+				System.out.println("down lamp on\n");
+			}else {
+				System.out.println("no direction lamp on\n");
+			}
+		}
+		System.out.println("end\n");
 	}
 
 //	public static void main(String args[]) throws IOException {

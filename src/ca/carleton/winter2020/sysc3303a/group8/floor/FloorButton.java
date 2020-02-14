@@ -29,7 +29,6 @@ public class FloorButton {
 	public void press(Direction direction) {
         if(!lampOn) {
             lampOn = true;
-            FLOOR.addStop(direction);
             FLOOR.setDirecionLamp(direction);
         }
 	}
