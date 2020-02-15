@@ -1,5 +1,7 @@
 # Elevator Simulation on Java
 
+[GitHub Page](https://github.com/AkazaRenn/elevator)
+
 ## Files Descriptions
 
 ### README.txt
@@ -52,3 +54,13 @@ Dennis Liu|Scheduler and floor subsystems development
 Zhi Qiao|Elevator raw data acquirement, floor subsystem development
 Xucheng Shi|UML and Seqence diagram skectching
 Frank Xu|Project management, elevator and scheduler subsystems development
+
+### Iteration 2
+
+Name|Role 
+---|---
+Mincky Feng|
+Dennis Liu|
+Zhi Qiao|Floor subsystem and test development
+Xucheng Shi|
+Frank Xu|State machine diagram sketching
