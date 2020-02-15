@@ -63,8 +63,8 @@ Frank Xu|Project management, elevator and scheduler subsystems development
 
 Name|Role 
 ---|---
-Mincky Feng|
+Mincky Feng|Update Elevator subsystem and Scheduler, Test for both system
 Dennis Liu|
 Zhi Qiao|Floor subsystem and test development
-Xucheng Shi|
+Xucheng Shi|Update Elevator subsystem and Scheduler, Test for both system
 Frank Xu|State machine diagram sketching
