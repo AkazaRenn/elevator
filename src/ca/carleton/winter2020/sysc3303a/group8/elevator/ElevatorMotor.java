@@ -1,7 +1,7 @@
 package ca.carleton.winter2020.sysc3303a.group8.elevator;
 
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
-
+import ca.carleton.winter2020.sysc3303a.group8.elevator.ElevatorStates;
 /**
  * Motor in the elevator system controlling the movement of the elevator
  * 
