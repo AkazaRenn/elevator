@@ -12,10 +12,6 @@ Description of the project as a Markdown source file.
 
 Description of the project as a text file.
 
-### miscellaneous\README.pdf
-
-Description of the project as a Markdown source file.
-
 ### miscellaneous\specs.xlsx
 
 Specifictions of the elevator simulated, including its speed, accleration, etc.
