@@ -2,7 +2,7 @@ package ca.carleton.winter2020.sysc3303a.group8.floor;
 
 import java.util.ArrayList;
 
-//import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
+import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 /** FloorSubsystem.java
@@ -20,7 +20,7 @@ public class FloorSubsystem {
 	int bottomFloor = 0;
 	int totalFloor = 7;
 
-    //private final Scheduler SCHEDULER;
+    private Scheduler SCHEDULER;
     public final int BOTTOM_FLOOR;
     public final int TOP_FLOOR;
     private int stopNum = 0;
@@ -28,8 +28,20 @@ public class FloorSubsystem {
 	Direction defaultDirection = Direction.HOLD;
 	
 	public ArrayList<Floor> floors;
-//Scheduler scheduler,
-	public FloorSubsystem( int bottomFloor, int topFloor) {
+	
+	public FloorSubsystem(Scheduler scheduler, int bottomFloor, int topFloor) {
+		//Send messages to this scheduler
+		SCHEDULER = scheduler;
+		BOTTOM_FLOOR = bottomFloor;
+		TOP_FLOOR = topFloor;
+		stopNum = 0;
+		floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
+        for(int i = bottomFloor; i <= topFloor; i++) {
+        	floors.add(new Floor(this,i));
+        	floors.get(i).setDirecionLamp(defaultDirection);
+        }
+	}
+	public FloorSubsystem(int bottomFloor, int topFloor) {
 		//Send messages to this scheduler
 		//SCHEDULER = scheduler;
 		BOTTOM_FLOOR = bottomFloor;
@@ -50,6 +62,10 @@ public class FloorSubsystem {
 		floors.get(floorNum).setDirecionLamp(direction);
 		floors.get(floorNum).DetectArrive();
 		stopNum++;
+	}
+	
+	public void sendStop(Direction direction, int floorNum) {
+		SCHEDULER.receiveStop(direction, floorNum);
 	}
 	
 	/*
