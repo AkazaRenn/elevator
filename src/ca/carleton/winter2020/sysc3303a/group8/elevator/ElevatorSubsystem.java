@@ -43,6 +43,10 @@ public class ElevatorSubsystem extends Thread {
      * 
      * @return the direction of the elevator
      */
+    public Direction getStates() {
+        return MOTOR.getStates();
+    }
+    
     public Direction getDirection() {
         return MOTOR.getDirection();
     }
