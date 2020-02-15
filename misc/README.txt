@@ -5,22 +5,22 @@ Files Descriptions
 README.md
 Description of the project as a Markdown source file.
 
-miscellaneous\README.txt
+misc\README.txt
 Description of the project as a text file.
 
-miscellaneous\specs.xlsx
+misc\specs.xlsx
 Specifictions of the elevator simulated, including its speed, accleration, etc.
 
-miscellaneous\class_diagram.pdf
+misc\class_diagram.pdf
 UML class diagram of the project.
 
-miscellaneous\sequence_diagram.pdf
+misc\sequence_diagram.pdf
 UML sequence diagram of the project.
 
-miscellaneous\state_machine_scheduler.pdf
+misc\state_machine_scheduler.pdf
 UML state machine diagram of the scheduler subsystem.
 
-miscellaneous\state_machine_elevator.pdf
+misc\state_machine_elevator.pdf
 UML state machine diagram of the elevator subsystem.
 
 src*
