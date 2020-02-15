@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
+import ca.carleton.winter2020.sysc3303a.group8.elevator.ElevatorStates;
 
 class ElevatorSubsystemTest {
 
@@ -22,12 +23,16 @@ class ElevatorSubsystemTest {
 
     @Test
     void getAndChangeDirection() {
+        assertEquals(ElevatorStates.E_EMPTY, e.getStates());
         assertEquals(elevator.getDirection(), Direction.HOLD);
         elevator.moveUp();
+        assertEquals(ElevatorStates.E_IN_USE, e.getStates());
         assertEquals(elevator.getDirection(), Direction.UP);
         elevator.stopMoving();
+        assertEquals(ElevatorStates.E_EMPTY, e.getStates());
         assertEquals(elevator.getDirection(), Direction.HOLD);
         elevator.moveDown();
+        assertEquals(ElevatorStates.E_IN_USE, e.getStates());
         assertEquals(elevator.getDirection(), Direction.DOWN);
     }
 
