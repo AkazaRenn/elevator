@@ -32,10 +32,10 @@ UML state machine diagram of the scheduler subsystem.
 
 UML state machine diagram of the elevator subsystem.
 
-### src\*
+### src\\*
 Source codes of the project.
 
-### test\*
+### test\\*
 Test codes of the project.
 
 ## Setup Instructions
