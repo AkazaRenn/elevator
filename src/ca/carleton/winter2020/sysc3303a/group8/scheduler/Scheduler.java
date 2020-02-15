@@ -26,11 +26,13 @@ public class Scheduler extends Thread {
             ELEVATORS.add(new Elevator(this,id,MIN_FLOOR,MAX_FLOOR));
         }
         FLOORSYS = new FloorSubsystem(MIN_FLOOR,MAX_FLOOR);
+        states = SchedulerStates.WAITING;
     }
     
     public void receiveStop(Direction direction, int floor) {
         //TODO some logic to select an elevator
         ELEVATORS.get(0).addStop(direction, floor);
+        states = SchedulerStates.R_ELEVATOR;
     }
 
     public synchronized void arriveAtFloor(int elevatorId, int floor) {
@@ -51,7 +53,13 @@ public class Scheduler extends Thread {
 //            FLOORSYS.get(i).setDirecionLamp(ELEVATORS.get(elevatorId).getDirection());
 //        }
     }
+    public SchedulerStates getStates(){
+        return states;
+    }
     
+    public void receiveFromFloor(){
+        states = SchedulerStates.R_FLOOR;
+    }
 
     @Override
     public void run() {

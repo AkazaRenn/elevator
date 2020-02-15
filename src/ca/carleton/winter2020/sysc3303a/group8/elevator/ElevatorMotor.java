@@ -10,12 +10,12 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 public class ElevatorMotor {
     
     private final ElevatorSubsystem ELEVATOR;
-    
+     private ElevatorStates states;
     private Direction direction;
     
     public ElevatorMotor(ElevatorSubsystem elevator) {
         ELEVATOR = elevator;
-
+         states = ElevatorStates.NOTINUSE;
         direction = Direction.HOLD;
     }
     
@@ -24,6 +24,7 @@ public class ElevatorMotor {
      */
     public void moveUp() {
         direction = Direction.UP;
+        states = ElevatorStates.INUSE;
         System.out.println("Elevator " + ELEVATOR.ELEVATOR_ID + " starts moving up.");
     }
     
@@ -32,6 +33,7 @@ public class ElevatorMotor {
      */
     public void moveDown() {
         direction = Direction.DOWN;
+        states = ElevatorStates.INUSE;
         System.out.println("Elevator " + ELEVATOR.ELEVATOR_ID + " starts moving down.");
     }
     
@@ -40,6 +42,7 @@ public class ElevatorMotor {
      */
     public void stop() {
         direction = Direction.HOLD;
+        states = ElevatorStates.NOTINUSE;
         System.out.println("Elevator " + ELEVATOR.ELEVATOR_ID + " stops.");
     }
     
@@ -50,5 +53,8 @@ public class ElevatorMotor {
      */
     public Direction getDirection() {
         return direction;
+    }
+    public ElevatorStates getStates(){
+        return states;
     }
 }
