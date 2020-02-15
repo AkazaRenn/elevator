@@ -57,10 +57,10 @@ Right-click the tests to be executed in the Package Explorer and choose Run As -
 
 Name|Role 
 ---|---
-Mincky Feng|UML and Seqence diagram skectching
+Mincky Feng|UML class and sequence diagram skectching
 Dennis Liu|Scheduler and floor subsystems development
 Zhi Qiao|Elevator raw data acquirement, floor subsystem development
-Xucheng Shi|UML and Seqence diagram skectching
+Xucheng Shi|UML class and sequence diagram skectching
 Frank Xu|Project management, elevator and scheduler subsystems development
 
 ### Iteration 2
