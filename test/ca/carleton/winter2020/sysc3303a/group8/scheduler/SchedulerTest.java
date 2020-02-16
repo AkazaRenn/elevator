@@ -19,6 +19,8 @@ class SchedulerTest {
         assertEquals(scheduler.SchedulerStates.WAITING, s.getStates());
         s.receiveStop(Direction.UP, 2);
         assertEquals(scheduler.SchedulerStates.R_ELEVATOR, s.getStates());
+	s.receiveFromFloor();
+	assertEquals(scheduler.SchedulerStates.R_FLOOR, s.getStates());
     }
 
 }
