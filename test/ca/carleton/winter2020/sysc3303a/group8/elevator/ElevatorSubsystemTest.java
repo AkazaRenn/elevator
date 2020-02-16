@@ -23,16 +23,16 @@ class ElevatorSubsystemTest {
 
     @Test
     void getAndChangeDirection() {
-        assertEquals(ElevatorStates.E_EMPTY, e.getStates());
+        assertEquals(ElevatorStates.NOTINUSE, elevator.getStates());
         assertEquals(elevator.getDirection(), Direction.HOLD);
         elevator.moveUp();
-        assertEquals(ElevatorStates.E_IN_USE, e.getStates());
+        assertEquals(ElevatorStates.INUSE, elevator.getStates());
         assertEquals(elevator.getDirection(), Direction.UP);
         elevator.stopMoving();
-        assertEquals(ElevatorStates.E_EMPTY, e.getStates());
+        assertEquals(ElevatorStates.NOTINUSE, elevator.getStates());
         assertEquals(elevator.getDirection(), Direction.HOLD);
         elevator.moveDown();
-        assertEquals(ElevatorStates.E_IN_USE, e.getStates());
+        assertEquals(ElevatorStates.INUSE, elevator.getStates());
         assertEquals(elevator.getDirection(), Direction.DOWN);
     }
 
