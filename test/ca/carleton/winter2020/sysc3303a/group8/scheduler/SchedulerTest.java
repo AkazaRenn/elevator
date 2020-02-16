@@ -1,4 +1,6 @@
 package ca.carleton.winter2020.sysc3303a.group8.scheduler;
+import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
+import ca.carleton.winter2020.sysc3303a.group8.scheduler.SchedulerStates;
 
 import static org.junit.jupiter.api.Assertions.*;
 
