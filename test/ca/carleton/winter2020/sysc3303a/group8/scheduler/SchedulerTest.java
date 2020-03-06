@@ -18,11 +18,11 @@ class SchedulerTest {
     
     @Test
     void test() {
-        assertEquals(scheduler.SchedulerStates.WAITING, s.getStates());
+        assertEquals(s.SchedulerStates.WAITING, s.getStates());
         s.receiveStop(Direction.UP, 2);
-        assertEquals(scheduler.SchedulerStates.R_ELEVATOR, s.getStates());
+        assertEquals(s.SchedulerStates.R_ELEVATOR, s.getStates());
 	s.receiveFromFloor();
-	assertEquals(scheduler.SchedulerStates.R_FLOOR, s.getStates());
+	assertEquals(s.SchedulerStates.R_FLOOR, s.getStates());
     }
 
 }
