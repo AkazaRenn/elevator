@@ -9,28 +9,28 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
  */
 public class FloorButton {
 
-	private Floor FLOOR;
-	private Direction direction;
-	boolean lampOn = false;
-	
-	public FloorButton(Floor floor,Direction direction) {	
-		FLOOR = floor;
-		this.direction = direction;		
-	}
+    private final Floor FLOOR;
+    private final Direction DIRECTION;
+    boolean lampOn = false;
+    
+    public FloorButton(Floor floor, Direction DIRECTION) {    
+        FLOOR = floor;
+        DIRECTION = DIRECTION;        
+    }
 
-	public Direction getDirection() {
-		return direction;
-	}
+    public Direction getDirection() {
+        return DIRECTION;
+    }
 
-	public boolean isLampOn() {
-		return lampOn;
-	}
-	
-	public void press(Direction direction) {
+    public boolean isLampOn() {
+        return lampOn;
+    }
+    
+    public void press(Direction DIRECTION) {
         if(!lampOn) {
             lampOn = true;
-            FLOOR.setDirecionLamp(direction);
+            FLOOR.buttonPressed(this);
         }
-	}
+    }
 }
 
