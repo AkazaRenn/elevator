@@ -13,9 +13,9 @@ public class FloorButton {
     private final Direction DIRECTION;
     boolean lampOn = false;
     
-    public FloorButton(Floor floor, Direction DIRECTION) {    
+    public FloorButton(Floor floor, Direction direction) {    
         FLOOR = floor;
-        DIRECTION = DIRECTION;        
+        DIRECTION = direction;        
     }
 
     public Direction getDirection() {
