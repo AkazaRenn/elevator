@@ -36,8 +36,7 @@ public class FloorSubsystem {
     public final int TOP_FLOOR;
     private final int ELEVATOR_COUNT;
     
-    private DatagramSocket sendSocket;
-    private DatagramSocket recvSocket;
+    private DatagramSocket socket;
     private List<Floor> floors;
     
     public FloorSubsystem(int bottomFloor, int topFloor, int carNum) {
@@ -53,7 +52,7 @@ public class FloorSubsystem {
         }
         
         try {
-            sendSocket = new DatagramSocket(SELF_PORT);
+            socket = new DatagramSocket(SELF_PORT);
         } catch (SocketException e) {
             System.exit(1);
         }
@@ -69,8 +68,8 @@ public class FloorSubsystem {
         return bytes;
     }
     
-    private String readBuf(byte[] bytes) {
-        return new String(Arrays.copyOfRange(bytes, 1, bytes.length));
+    private String[] readBuf(byte[] bytes) {
+        return new String(Arrays.copyOfRange(bytes, 1, bytes.length)).split("\0");
     }
     
     /*
@@ -94,7 +93,7 @@ public class FloorSubsystem {
         }
         
         try {
-            sendSocket.send(packet);
+            socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -102,5 +101,38 @@ public class FloorSubsystem {
         
         floors.get(floorNum).setDirecionLamp(direction);
         floors.get(floorNum).detectArrive();
+    }
+    
+    public void respondRequest(String msg) {
+        byte[] bytes = {Command.ACK.getCommandByte()};
+        DatagramPacket recvPacket = new DatagramPacket(new byte[1024], 1024);
+        try {
+            socket.send(new DatagramPacket(bytes, bytes.length, InetAddress.getByName(SCHEDULER_HOSTNAME), SCHEDULER_PORT));
+            socket.receive(recvPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        
+
+        String[] data = readBuf(recvPacket.getData());
+        Floor floor = floors.get(Integer.parseInt(data[0]));
+        if(floor.getUpLamp()) {
+            floor.setDirecionLamp(Direction.UP);
+        } else if(floor.getDownLamp()) {
+            floor.setDirecionLamp(Direction.DOWN);
+        }
+        
+        recvPacket.setData(createBuf(Command.ACK, data[0].getBytes()));
+        try {
+            socket.send(recvPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    public static void main(String[] args) {
+        
     }
 }
