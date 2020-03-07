@@ -1,45 +1,46 @@
 package ca.carleton.winter2020.sysc3303a.group8.elevator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import ElevatorSystem.*;
+import junit.framework.*;
 
-import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
-import ca.carleton.winter2020.sysc3303a.group8.elevator.ElevatorStates;
+public class ElevatorTest extends TestCase{
+	private Elevator e;
+	private ElevatorDirection direction;
+	private ElevatorStatus status;
+	private ElevatorControl control;
 
-class ElevatorSubsystemTest {
+	public void setUp() throws Exception {
+		
+		e = new Elevator("4", direction.E_UP);
+		control = new ElevatorControl(5000, 3, "4");
+	}
+	
+	public void tearDown() throws Exception {
+		e = null;
+		control = null;
+	}
 
-    private static final int ELEVATOR_ID = 1;
-    private static final int BOTTOM_FLOOR = -2;
-    private static final int TOP_FLOOR = 5;
-    
-    private ElevatorSubsystem elevator;
-    
-    @BeforeEach
-    void setup() {
-        elevator = new ElevatorSubsystem(null, ELEVATOR_ID, BOTTOM_FLOOR, TOP_FLOOR);
-    }
-
-    @Test
-    void getAndChangeDirection() {
-        assertEquals(ElevatorStates.NOTINUSE, elevator.getStates());
-        assertEquals(elevator.getDirection(), Direction.HOLD);
-        elevator.moveUp();
-        assertEquals(ElevatorStates.INUSE, elevator.getStates());
-        assertEquals(elevator.getDirection(), Direction.UP);
-        elevator.stopMoving();
-        assertEquals(ElevatorStates.NOTINUSE, elevator.getStates());
-        assertEquals(elevator.getDirection(), Direction.HOLD);
-        elevator.moveDown();
-        assertEquals(ElevatorStates.INUSE, elevator.getStates());
-        assertEquals(elevator.getDirection(), Direction.DOWN);
-    }
-
-    // @Test
-    // public void addAndArriveAtStops() {
-    //     elevator.addStop(floor);
-    //     elevator.updateCurrentFloor(-1);
-    // }
+	public void test() {
+		assertEquals("4", e.getCurrentFloor());
+		assertEquals(4, e.getIntFloor());
+		assertEquals(ElevatorDirection.E_UP, e.getDirection());
+		Elevator e2 = new Elevator("4", direction.E_HOLD); //creating second elevator object
+		assertEquals(ElevatorStatus.E_IN_USE, e.getStatus());
+		assertEquals(4, control.toInt("4"));
+	}
+	
+	public void TestcreatePacketData() throws UnknownHostException {
+		
+		String data = "\0" + "1" + "\0" + "3" + "\0"; 
+		byte[] dataB = data.getBytes(); 
+		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.getBytes().length, InetAddress.getLocalHost(), 5000);
+		assertEquals(packet, control.createPacket("1", "3", 5000));
+	}
+	
+	
 
 }
