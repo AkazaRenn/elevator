@@ -1,8 +1,17 @@
 package ca.carleton.winter2020.sysc3303a.group8.floor;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
+import ca.carleton.winter2020.sysc3303a.group8.utils.Command;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
 /** FloorSubsystem.java
@@ -10,118 +19,88 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
  * The FloorSubsystem sends a character string to the echo server, 
  * then waits for the server to send it back to the Floor Subsystem.
  * @author Zhi Qiao and Dennis Liu
+ * @author Frank Xu
  * */
 
 public class FloorSubsystem {
-	int numFloors;
-	int upperFloor;
-	int lowerFloor;
-	
-	int bottomFloor = 0;
-	int totalFloor = 7;
-
-    private Scheduler SCHEDULER;
+    private static final String SCHEDULER_HOSTNAME = "localhost";
+    private static final int SCHEDULER_PORT = 1000;
+    private static final int SELF_PORT = 1200;
+    
+    private static final int INITIAL_FLOOR = 1;
+    private static final int CAR_COUNT = 2;
+    
+    private static final Direction DEFAULT_DIRECTION = Direction.HOLD;
+    
     public final int BOTTOM_FLOOR;
     public final int TOP_FLOOR;
-    private int stopNum = 0;
-	
-	Direction defaultDirection = Direction.HOLD;
-	
-	public ArrayList<Floor> floors;
-	
-	public FloorSubsystem(Scheduler scheduler, int bottomFloor, int topFloor) {
-		//Send messages to this scheduler
-		SCHEDULER = scheduler;
-		BOTTOM_FLOOR = bottomFloor;
-		TOP_FLOOR = topFloor;
-		stopNum = 0;
-		floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
+    private final int ELEVATOR_COUNT;
+    
+    private DatagramSocket sendSocket;
+    private DatagramSocket recvSocket;
+    private List<Floor> floors;
+    
+    public FloorSubsystem(int bottomFloor, int topFloor, int carNum) {
+        //Send messages to this scheduler
+        BOTTOM_FLOOR = bottomFloor;
+        TOP_FLOOR = topFloor;
+        ELEVATOR_COUNT = carNum;
+        
+        floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
         for(int i = bottomFloor; i <= topFloor; i++) {
-        	floors.add(new Floor(this,i));
-        	floors.get(i).setDirecionLamp(defaultDirection);
+                floors.add(new Floor(this, i, CAR_COUNT, INITIAL_FLOOR));
+                floors.get(i).setDirecionLamp(DEFAULT_DIRECTION);
         }
-	}
-	public FloorSubsystem(int bottomFloor, int topFloor) {
-		//Send messages to this scheduler
-		//SCHEDULER = scheduler;
-		BOTTOM_FLOOR = bottomFloor;
-		TOP_FLOOR = topFloor;
-		stopNum = 0;
-		floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
-        for(int i = bottomFloor; i <= topFloor; i++) {
-        	floors.add(new Floor(this,i));
-        	floors.get(i).setDirecionLamp(defaultDirection);
+        
+        try {
+            sendSocket = new DatagramSocket(SELF_PORT);
+        } catch (SocketException e) {
+            System.exit(1);
         }
-		
-	}
-	/*
-	 * set a stop floor for elevator
-	 */
-	public void setStop(Direction direction, int floorNum) {
-		//SCHEDULER.receiveStop(direction, floorNum);
-		floors.get(floorNum).setDirecionLamp(direction);
-		floors.get(floorNum).DetectArrive();
-		stopNum++;
-	}
-	
-	public void sendStop(Direction direction, int floorNum) {
-		SCHEDULER.receiveStop(direction, floorNum);
-	}
-	
-	/*
-	 * detecting whether the elevator arrives a floor
-	 * if arrives, set direction lamp and floor number lamp
-	 */
-	public void ElevatorMoving(int currentFloor) {
-		for (Floor floor:floors){
-			// arrive a floor
-			if(floor.getFloorNum() == currentFloor) {
-				floor.setFloorLamp(currentFloor);
-				System.out.println(String.format("arrive %s floor",currentFloor));
-			}
-			// Verify stop
-			if(floor.ElevatorArrive()&&floor.getFloorNum() == currentFloor) {
-				if(stopNum!= 1 ) { // arrive a stop but still other stop 
-					floor.setDirecionLamp(defaultDirection);
-					floor.setFloorLamp(currentFloor);
-					floor.notArrive();
-					System.out.println("move to next stop\n");
-					stopNum--;
-					
-					
-				}else if(stopNum == 1){ // arrive a stop and no more stop
-					floor.setDirecionLamp(defaultDirection);
-					floor.setFloorLamp(currentFloor);
-					floor.notArrive();
-					System.out.println("last stop\n");
-					stopNum--;
-					
-				}
-			} 
-				
-		}
-	}
-	
-	public void FloorInfor(int currentFloor) {
-		System.out.println("floor information: ");
-		for (Floor floor:floors){
-			System.out.print("current floor: ");
-			System.out.println(floor.getFloorNum());
-			System.out.print("floor lamp: ");
-			System.out.println(currentFloor);
-			if (floor.getUpLamp()) {
-				System.out.println("up lamp on");
-			}else if(floor.getDownLamp()) {
-				System.out.println("down lamp on");
-			}else {
-				System.out.println("no direction lamp on");
-			}
-		}
-		System.out.println("end\n");
-	}
-
-//	public static void main(String args[]) throws IOException {
-//		FloorSubsystem floorSubsystem = new FloorSubsystem();
-//		System.out.println("floor set");
-//   }
+    }
+    
+    private byte[] createBuf(Command header, byte[] content) {
+        byte[] bytes = new byte[content.length + 1];
+        bytes[0] = header.getCommandByte();
+        for(int i = 0; i < content.length; i++) {
+            bytes[i + 1] = content[i];
+        }
+        
+        return bytes;
+    }
+    
+    private String readBuf(byte[] bytes) {
+        return new String(Arrays.copyOfRange(bytes, 1, bytes.length));
+    }
+    
+    /*
+     * set a stop floor for elevator
+     */
+    public void setStop(Direction direction, Integer floorNum) {
+        byte[] msg = null;
+        if(direction == Direction.UP) {
+            msg = createBuf(Command.UP_PICKUP, floorNum.toString().getBytes());
+        } else {
+            msg = createBuf(Command.DOWN_PICKUP, floorNum.toString().getBytes());
+        }
+        
+        DatagramPacket packet = null;
+        try {
+            packet = new DatagramPacket(msg, msg.length, 
+                    InetAddress.getByName(SCHEDULER_HOSTNAME), SCHEDULER_PORT);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        
+        try {
+            sendSocket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        
+        floors.get(floorNum).setDirecionLamp(direction);
+        floors.get(floorNum).detectArrive();
+    }
 }
