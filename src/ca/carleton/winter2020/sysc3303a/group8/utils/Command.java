@@ -1,9 +1,14 @@
 package ca.carleton.winter2020.sysc3303a.group8.utils;
 
 public enum Command {
-    UP((byte)0x01),
-    DOWN((byte)0x02),
-    HOLD((byte)0x00),
+
+    // data headers buf[0]
+    ACK((byte)0x01),
+    CMD((byte)0x02),
+    DATA((byte)0x03),
+    ERROR((byte)0x04),
+
+    // data contents buf[1]
     FLOOR_BUTTON((byte)0x10),
     ELEVATOR_ARRIVED((byte)0x11),
     UP_PICKUP((byte)0x33),
