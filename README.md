@@ -72,8 +72,8 @@ Frank Xu|State machine diagrams sketching
 ### Iteration 3
 Name|Role
 ---|---
-Mincky Feng|
+Mincky Feng| Update Scheduler
 Dennis Liu| Update elevator
 Zhi Qiao|UML diagrams sketching
-Xucheng Shi|
+Xucheng Shi| Update Scheduler
 Frank Xu|Update floor subsystem
