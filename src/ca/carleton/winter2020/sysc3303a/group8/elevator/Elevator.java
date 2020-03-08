@@ -55,6 +55,30 @@ public class Elevator extends Thread {
 		return ins;
 	}
 	
+	public static DatagramPacket createPacket(String packetType, String code, int port) {
+		String data = "";
+		DatagramPacket packet = null;
+
+		if (packetType.equals("1")) {				// ACK
+			data = "\0" + ACK + "\0" + code + "\0";
+		} else if (packetType.equals("2")) {				//CMD
+			data = "\0" + CMD + "\0" + code + "\0";
+		} else if (packetType.equals("3")) {				//CMD
+			data = "\0" + DATA + "\0" + code + "\0";
+		} else if (packetType.equals("0")) {
+			data = "\0" + ERROR + "\0" + code + "\0"; // ERROR
+		}
+
+		try {			
+			packet = new DatagramPacket(data.getBytes(), data.getBytes().length, InetAddress.getLocalHost(), port);
+		}catch (UnknownHostException uhe) {	
+			System.out.println("ELEVATOR: unable to create packet (UnknownHostException), exiting.");
+			System.exit(1);
+		}
+
+		return packet;
+	}
+	
 	public void routine() {
 		byte data[] = new byte[100];
 		receivePacket = new DatagramPacket(data,data.length);
@@ -78,18 +102,26 @@ public class Elevator extends Thread {
 				switch(msg[1]) {
 				
 				case UP_DROPOFF:
+					System.out.println("cmd, UP for drop off");
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
 					break;
 				case UP_PICKUP:
+					System.out.println("cmd, UP for pick up");
 					break;
 				case DOWN_DROPOFF:
+					System.out.println("cmd, DOWN for drop off");
 					break;
 				case DOWN_PICKUP:
+					System.out.println("cmd, DOWN for pick up");
 					break;
 				case DOOR_OPEN:
+					System.out.println("cmd, open door");
 					break;
 				case DOOR_CLOSE:
+					System.out.println("cmd, close door");
 					break;
 				case STOP:
+					System.out.println("cmd, stop");
 					break;
 				
 				}

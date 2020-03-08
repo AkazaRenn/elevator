@@ -77,6 +77,10 @@ public class ElevatorSubsystem extends Thread {
         BUTTONS.get(currentFloor).floorArrived();
         return floorNumber;
     }
+    
+    public int getCurrentFloor() {
+    	return currentFloor;
+    }
 
     /**
      * Add a stop to the queue of scheduler
