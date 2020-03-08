@@ -68,3 +68,12 @@ Dennis Liu| Update Elevator subsystem, UML Sequence and class diagram
 Zhi Qiao|Floor subsystem and test development
 Xucheng Shi|Update Elevator subsystem and Scheduler, Test for both system
 Frank Xu|State machine diagrams sketching
+
+### Iteration 3
+Name|Role
+---|---
+Mincky Feng|
+Dennis Liu| 
+Zhi Qiao|UML diagrams sketching
+Xucheng Shi|
+Frank Xu|Update floor subsystem
