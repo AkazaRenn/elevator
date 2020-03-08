@@ -73,7 +73,7 @@ Frank Xu|State machine diagrams sketching
 Name|Role
 ---|---
 Mincky Feng|
-Dennis Liu| 
+Dennis Liu| Update elevator
 Zhi Qiao|UML diagrams sketching
 Xucheng Shi|
 Frank Xu|Update floor subsystem
