@@ -32,7 +32,11 @@ public class Elevator extends Thread {
 	private static int elevator_id;
 	private ElevatorSubsystem elevatorSubSystem;
 	private DatagramSocket sendSocket, receiveSocket;
-	private DatagramPacket sendPacket,receivePacket;
+	private DatagramPacket sendPacket,receivePacket,ackPacket;
+	public static Elevator elevator1, elevator2;
+	
+	private static int status = 0;
+	private static int send = 0;
 	
 	public Elevator(int port, int id, int num_floor) {
 		this.elevator_id = id;
@@ -60,7 +64,7 @@ public class Elevator extends Thread {
 		DatagramPacket packet = null;
 
 		if (packetType.equals("1")) {				// ACK
-			data = "\0" + ACK + "\0" + code + "\0";
+			data = "\0" + Command.ACK + "\0" + code + "\0";
 		} else if (packetType.equals("2")) {				//CMD
 			data = "\0" + CMD + "\0" + code + "\0";
 		} else if (packetType.equals("3")) {				//CMD
@@ -104,15 +108,32 @@ public class Elevator extends Thread {
 				case UP_DROPOFF:
 					System.out.println("cmd, UP for drop off");
 					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved up, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					status = 0;
+					send = 1;
+					
 					break;
 				case UP_PICKUP:
 					System.out.println("cmd, UP for pick up");
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": wait for data " + elevatorSubSystem.getCurrentFloor());
+					status = 1;
+					send = 0;
+					
 					break;
 				case DOWN_DROPOFF:
 					System.out.println("cmd, DOWN for drop off");
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved down, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					status = 0;
+					send = 1;
 					break;
 				case DOWN_PICKUP:
 					System.out.println("cmd, DOWN for pick up");
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": wait for data " + elevatorSubSystem.getCurrentFloor());
+					status = 1;
+					send = 0;
 					break;
 				case DOOR_OPEN:
 					System.out.println("cmd, open door");
@@ -123,8 +144,24 @@ public class Elevator extends Thread {
 				case STOP:
 					System.out.println("cmd, stop");
 					break;
-				
 				}
+				
+				ackPacket=createPacket(ACK, msg[1],receivePacket.getPort());
+				try {
+					sendSocket.send(ackPacket);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					System.exit(1);
+				}
+				if (send == 1) {
+					try {
+						sendSocket.send(sendPacket);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						System.exit(1);
+					}
+					send = 0;
+				}		
 				
 				break;
 			case ACK:
@@ -134,4 +171,14 @@ public class Elevator extends Thread {
 			}
 		}
 	}
+	
+
+	public static void main(String[] args) {
+		elevator1 = new Elevator(1100,1,6);
+		elevator2 = new Elevator(1101,2,6);
+		
+		elevator1.start();
+		elevator2.start();
+	}
+	
 }
