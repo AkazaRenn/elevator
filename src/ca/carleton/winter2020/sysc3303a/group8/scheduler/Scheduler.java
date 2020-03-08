@@ -5,26 +5,13 @@ import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
-import utils.Command;
 
-public class Scheduler {
-	
-	
-	public static final String ACK = "1";
-	public static final String CMD = "2";
-	public static final String DATA = "3";
-	public static final String ERROR = "0";
-	public static final String FLOOR_BUTTON = "0x10";						
-	public static final String ELEVATOR_ARRIVED = "0x11"; 					
-	public static final String UP_PICKUP = "0x33";							
-	public static final String UP_DROPOFF = "0x32"; 						
-	public static final String DOWN_PICKUP = "0x31";						
-	public static final String DOWN_DROPOFF = "0x30";						
-	public static final String DOOR_OPEN = "0x3A";							
-	public static final String DOOR_CLOSE = "0x3B";							
-	public static final String STOP = "0x3C";								
-	public static final String ERROR_DOOR_JAM = "0xE0";						
-	public static final String ERROR_STUCK = "0xE1";						
+import ca.carleton.winter2020.sysc3303a.group8.utils.Command;
+
+
+
+
+public class Scheduler {							
 
 	final int HOSTPORT = 1000;
 	final int EPORT1 = 1100;
@@ -76,8 +63,7 @@ public class Scheduler {
 				System.out.println(String.format("main: received packet ( string >> %s, byte array >> %s ).\n", new String(rPacket.getData()), rPacket.getData()));
 				String[] rPacketParsed = parsePacket(rPacket.getData());
 				
-				// Receive command
-				if (rPacketParsed[0].equals(Command.CMD)) {					
+				if (rPacketParsed[0].equals(Byte.toString(Command.CMD.getCommandByte()))) {					
 					
 					handleFloorCommand(rPacketParsed[1], rPacket.getPort());				
 				}
@@ -102,7 +88,7 @@ public class Scheduler {
 		DatagramPacket aPacket = createPacket(Command.ACK, cmd, port);
 		DatagramPacket dPacket = new DatagramPacket(data, data.length);
 				
-		if (cmd.equals(Command.FLOOR_BUTTON)) {
+		if (cmd.equals(Byte.toString(Command.FLOOR_BUTTON.getCommandByte()))) {
 			try {
 				floorSocket = new DatagramSocket();
 				System.out.println("main: acking.");
@@ -114,7 +100,7 @@ public class Scheduler {
 				System.out.println(String.format("main: received data ( string >> %s, byte array >> %s ).\n", new String(dPacket.getData()), dPacket.getData()));
 				System.out.println(Arrays.toString(dPacketParsed));
 				
-				if (dPacketParsed[0].equals(DATA)) {
+				if (dPacketParsed[0].equals(Byte.toString(Command.DATA.getCommandByte()))) {
 					aPacket = createPacket(Command.ACK, dPacketParsed[1], port);
 					System.out.println("main: acking data.");
 					floorSocket.send(aPacket);
@@ -203,25 +189,22 @@ public class Scheduler {
 	}
 	
 	
-	public static DatagramPacket createPacket(String packetType, String ins, int port) {
+	public static DatagramPacket createPacket(Command ack2, String ins, int port) {
 		String data;
 		DatagramPacket packet = null;
+		String ack =Byte.toString(ack2.getCommandByte());
 		
-		// error
-		if (packetType == "0") {			
-			data = "\0" + ERROR + "\0" + ins + "\0";					
+		if (ack == "0") {			
+			data = "\0" + Command.ERROR + "\0" + ins + "\0";					
 		}
-		// ack
-		else if (packetType == "1") {			
-			data = "\0" + ACK + "\0" + ins + "\0";
+		else if (ack == "1") {			
+			data = "\0" + Command.ACK + "\0" + ins + "\0";
 		}
-		// cmd
-		else if (packetType == "2") {
-			data = "\0" + CMD + "\0" + ins + "\0";
+		else if (ack == "2") {
+			data = "\0" + Command.CMD + "\0" + ins + "\0";
 		}
-		// data
 		else {
-			data = "\0" + DATA + "\0" + ins + "\0";
+			data = "\0" + Command.DATA + "\0" + ins + "\0";
 		}		
 		
 		try {			
@@ -240,7 +223,6 @@ public class Scheduler {
 		scheduler.run();
 	}
 }
-
 
 
 
@@ -303,26 +285,26 @@ class ElevatorHandler extends Thread {
 				direction = parsedData[2];			
 				
 				if (Integer.parseInt(srcFloor) > currentFloor) {
-					pIns = Scheduler.UP_PICKUP;
+					pIns = Byte.toString(Command.UP_PICKUP.getCommandByte());
 					currentDirection = "UP";
 				}
 				else if (Integer.parseInt(srcFloor) < currentFloor) {
-					pIns = Scheduler.DOWN_PICKUP;
+					pIns = Byte.toString(Command.DOWN_PICKUP.getCommandByte());
 					currentDirection = "DOWN";
 				}
 				else {
-					pIns = Scheduler.STOP;	// elevator is already there			
+					pIns = Byte.toString(Command.STOP.getCommandByte());	// elevator is already there			
 				}
 				performPickup(pIns, request);
 				
 				if (status.equals("WORKING")) {
 					// drop off direction
 					if (direction.equals("UP")) {
-						dIns = Scheduler.UP_DROPOFF;
+						dIns = Byte.toString(Command.UP_DROPOFF.getCommandByte());
 						currentDirection = "UP";
 					}
-					else { //down
-						dIns = Scheduler.DOWN_DROPOFF;
+					else { 
+						dIns = Byte.toString(Command.DOWN_DROPOFF.getCommandByte());
 						currentDirection = "DOWN";
 					}		
 					performDropoff(dIns, request);					
@@ -341,17 +323,17 @@ class ElevatorHandler extends Thread {
 		
 		String srcFloor, destFloor;
 		String[] parsedData;
-		boolean keepMoving = (ins.equals(Scheduler.STOP) ? false : true); 
-		String error = Scheduler.ERROR_STUCK;
+		boolean keepMoving = (ins.equals(Byte.toString(Command.STOP.getCommandByte())) ? false : true); 
+		String error = Byte.toString(Command.ERROR_STUCK.getCommandByte());
 		
 		parsedData = request.split(" ");
 		srcFloor = parsedData[1];
 		destFloor = parsedData[3];
 		
 		byte[] buffer = new byte[8];
-		DatagramPacket cPacket = Scheduler.createPacket(Scheduler.CMD, ins, eport);
+		DatagramPacket cPacket = Scheduler.createPacket(Command.CMD, ins, eport);
 		DatagramPacket aPacket = new DatagramPacket(buffer, buffer.length);
-		DatagramPacket dPacket = Scheduler.createPacket(Scheduler.DATA, destFloor, eport);
+		DatagramPacket dPacket = Scheduler.createPacket(Command.DATA, destFloor, eport);
 		DatagramPacket rPacket = new DatagramPacket(buffer, buffer.length);
 		DatagramPacket ePacket = new DatagramPacket(buffer, buffer.length);
 		String[] rPacketParsed;
@@ -381,12 +363,12 @@ class ElevatorHandler extends Thread {
 					
 					currentFloor = Integer.parseInt(rPacketParsed[1]);
 					if (rPacketParsed[1].equals(srcFloor)) {
-						cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.STOP, eport);
+						cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.STOP.getCommandByte()), eport);
 						System.out.println(String.format("sub-%d: sending stop ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 						keepMoving = false;
 					}
 					else {
-						cPacket = Scheduler.createPacket(Scheduler.ACK, rPacketParsed[1], eport);
+						cPacket = Scheduler.createPacket(Command.ACK, rPacketParsed[1], eport);
 						System.out.println(String.format("sub-%d: sending continue ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));					
 					}				
 					eSocket.send(cPacket);
@@ -401,9 +383,9 @@ class ElevatorHandler extends Thread {
 				
 				sendPositionToFloor(srcFloor);
 				
-				error = Scheduler.ERROR_DOOR_JAM;
+				error = Byte.toString(Command.ERROR_DOOR_JAM.getCommandByte());
 				
-				cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.DOOR_OPEN, eport);
+				cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.DOOR_OPEN.getCommandByte()), eport);
 				System.out.println(String.format("sub-%d: sending open door ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 				eSocket.send(cPacket);
 				
@@ -413,7 +395,7 @@ class ElevatorHandler extends Thread {
 				System.out.println(String.format("sub-%d: received ack ( string >> %s, byte array >> %s ).", this.id, new String(aPacket.getData()), aPacket.getData()));
 				System.out.println(Arrays.toString(aPacketParsed));
 				
-				cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.DOOR_CLOSE, eport);
+				cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.DOOR_CLOSE.getCommandByte()), eport);
 				System.out.println(String.format("sub-%d: sending close door ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 				eSocket.send(cPacket);
 				
@@ -425,7 +407,7 @@ class ElevatorHandler extends Thread {
 			}
 			catch (SocketTimeoutException ste) {
 				System.out.println(String.format("sub-%d: error encountered, taking elevator out of operation.", this.id));
-				ePacket = Scheduler.createPacket(Scheduler.ERROR, error, eport);							
+				ePacket = Scheduler.createPacket(Command.ERROR, error, eport);							
 				eSocket.send(ePacket);
 				
 				eSocket.receive(aPacket);
@@ -446,13 +428,13 @@ class ElevatorHandler extends Thread {
 		String destFloor;
 		String[] parsedData;
 		boolean keepMoving = true;
-		String error = Scheduler.ERROR_STUCK;
+		String error = Byte.toString(Command.ERROR_STUCK.getCommandByte());
 		
 		parsedData = request.split(" ");
 		destFloor = parsedData[3];
 		
 		byte[] buffer = new byte[8];
-		DatagramPacket cPacket = Scheduler.createPacket(Scheduler.CMD, ins, eport);
+		DatagramPacket cPacket = Scheduler.createPacket(Command.CMD, ins, eport);
 		DatagramPacket aPacket = new DatagramPacket(buffer, buffer.length);
 		DatagramPacket rPacket = new DatagramPacket(buffer, buffer.length);
 		DatagramPacket ePacket = new DatagramPacket(buffer, buffer.length);
@@ -477,12 +459,12 @@ class ElevatorHandler extends Thread {
 					
 					currentFloor = Integer.parseInt(rPacketParsed[1]);
 					if (rPacketParsed[1].equals(destFloor)) {
-						cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.STOP, eport);
+						cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.STOP.getCommandByte()), eport);
 						System.out.println(String.format("sub-%d: sending stop ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 						keepMoving = false;
 					}
 					else {
-						cPacket = Scheduler.createPacket(Scheduler.ACK, rPacketParsed[1], eport);
+						cPacket = Scheduler.createPacket(Command.ACK, rPacketParsed[1], eport);
 						System.out.println(String.format("sub-%d: sending continue ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));					
 					}				
 					eSocket.send(cPacket);
@@ -495,9 +477,9 @@ class ElevatorHandler extends Thread {
 				System.out.println(String.format("sub-%d: received ack ( string >> %s, byte array >> %s ).", this.id, new String(aPacket.getData()), aPacket.getData()));
 				System.out.println(Arrays.toString(aPacketParsed));
 				
-				error = Scheduler.ERROR_DOOR_JAM;
+				error = Byte.toString(Command.ERROR_DOOR_JAM.getCommandByte());
 				
-				cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.DOOR_OPEN, eport);
+				cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.DOOR_OPEN.getCommandByte()), eport);
 				System.out.println(String.format("sub-%d: sending open door ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 				eSocket.send(cPacket);
 				
@@ -507,7 +489,7 @@ class ElevatorHandler extends Thread {
 				System.out.println(String.format("sub-%d: received ack ( string >> %s, byte array >> %s ).", this.id, new String(aPacket.getData()), aPacket.getData()));
 				System.out.println(Arrays.toString(aPacketParsed));
 				
-				cPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.DOOR_CLOSE, eport);
+				cPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.DOOR_CLOSE.getCommandByte()), eport);
 				System.out.println(String.format("sub-%d: sending close door ( string >> %s, byte array >> %s ).\n", this.id, new String(cPacket.getData()), cPacket.getData()));
 				eSocket.send(cPacket);
 				
@@ -521,7 +503,7 @@ class ElevatorHandler extends Thread {
 			}
 			catch (SocketTimeoutException ste) {
 				System.out.println(String.format("sub-%d: error encountered, taking elevator out of operation.", this.id));
-				ePacket = Scheduler.createPacket(Scheduler.ERROR, error, eport);							
+				ePacket = Scheduler.createPacket(Command.ERROR, error, eport);							
 				eSocket.send(ePacket);
 				
 				eSocket.receive(aPacket);
@@ -541,7 +523,7 @@ class ElevatorHandler extends Thread {
 	public void sendPositionToFloor(String floor) {
 		
 		byte[] buffer = new byte[8];
-		DatagramPacket sPacket = Scheduler.createPacket(Scheduler.CMD, Scheduler.ELEVATOR_ARRIVED, fport);		
+		DatagramPacket sPacket = Scheduler.createPacket(Command.CMD, Byte.toString(Command.ELEVATOR_ARRIVED.getCommandByte()), fport);		
 		DatagramPacket rPacket = new DatagramPacket(buffer, buffer.length);
 		String[] rPacketParsed;
 		
@@ -557,7 +539,7 @@ class ElevatorHandler extends Thread {
 			System.out.println(String.format("sub-%d: received ack ( string >> %s, byte array >> %s ).", this.id, new String(rPacket.getData()), rPacket.getData()));
 			System.out.println(Arrays.toString(rPacketParsed));
 			
-			sPacket = Scheduler.createPacket(Scheduler.DATA, floor, fport);
+			sPacket = Scheduler.createPacket(Command.DATA, floor, fport);
 			System.out.println(String.format("sub-%d: sending floor number ( string >> %s, byte array >> %s ).\n", this.id, new String(sPacket.getData()), sPacket.getData()));
 			tempSocket.send(sPacket);
 			
