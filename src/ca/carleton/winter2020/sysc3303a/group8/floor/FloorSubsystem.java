@@ -6,11 +6,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ca.carleton.winter2020.sysc3303a.group8.scheduler.Scheduler;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Command;
 import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
 
@@ -23,6 +25,8 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
  * */
 
 public class FloorSubsystem {
+    public static final Path INPUT_FILE = Paths.get("../input.txt"); 
+    
     private static final String SCHEDULER_HOSTNAME = "localhost";
     private static final int SCHEDULER_PORT = 1000;
     private static final int SELF_PORT = 1200;
@@ -103,7 +107,7 @@ public class FloorSubsystem {
         floors.get(floorNum).detectArrive();
     }
     
-    public void respondRequest(String msg) {
+    public void respondRequest() {
         byte[] bytes = {Command.ACK.getCommandByte()};
         DatagramPacket recvPacket = new DatagramPacket(new byte[1024], 1024);
         try {
@@ -132,7 +136,19 @@ public class FloorSubsystem {
         }
     }
     
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) throws Throwable {
+        FloorSubsystem system = new FloorSubsystem(1, 5, 2);
+        List<String> lines = Files.readAllLines(INPUT_FILE);
+        for(String line : lines) {
+            String[] data = line.split(" ");
+            if(data[2].equals("up")) {
+                system.setStop(Direction.UP, Integer.valueOf(data[1]));
+            } else {
+                system.setStop(Direction.DOWN, Integer.valueOf(data[1]));
+            }
+        }
+        while(true) {
+            system.respondRequest();
+        }
     }
 }
