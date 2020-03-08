@@ -13,24 +13,20 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
  */
 public class ElevatorSubsystem extends Thread {
 
-    public final Scheduler SCHEDULER;
+    public final int NUM_FLOOR;
     public final int ELEVATOR_ID;
-    public final int BOTTOM_FLOOR;
-    public final int TOP_FLOOR;
     public final ElevatorMotor MOTOR;
     public final List<ElevatorButton> BUTTONS;
     public final ElevatorDoor DOOR;
 
     private int currentFloor;
     
-    public ElevatorSubsystem(Scheduler scheduler, int elevatorId, int bottomFloor, int topFloor) {
-        SCHEDULER = scheduler;
-        ELEVATOR_ID = elevatorId;
-        BOTTOM_FLOOR = bottomFloor;
-        TOP_FLOOR = topFloor;
+    public ElevatorSubsystem(int elevator_id, int numFloor) {
+        NUM_FLOOR = numFloor;
+        ELEVATOR_ID = elevator_id;
         MOTOR = new ElevatorMotor(this);
-        BUTTONS = new ArrayList<>(topFloor - bottomFloor + 1);
-        for(int i = bottomFloor; i <= topFloor; i++) {
+        BUTTONS = new ArrayList<>(numFloor);
+        for(int i = 1; i <= numFloor; i++) {
             BUTTONS.add(new ElevatorButton(this, i));
         }
         DOOR = new ElevatorDoor(this);
@@ -78,7 +74,7 @@ public class ElevatorSubsystem extends Thread {
      * @return the current floor the elevator is at
      */
     public int updateCurrentFloor(int floorNumber) {
-        BUTTONS.get(currentFloor - BOTTOM_FLOOR).floorArrived();
+        BUTTONS.get(currentFloor).floorArrived();
         return floorNumber;
     }
 
@@ -86,8 +82,8 @@ public class ElevatorSubsystem extends Thread {
      * Add a stop to the queue of scheduler
      */
     public void addStop(int floor) {
-        SCHEDULER.addStop(ELEVATOR_ID, floor);
-        BUTTONS.get(floor - BOTTOM_FLOOR).turnOnLamp();
+        //SCHEDULER.addStop(ELEVATOR_ID, floor);
+        //BUTTONS.get(floor - BOTTOM_FLOOR).turnOnLamp();
     }
 
     // @Override
