@@ -42,7 +42,7 @@ public class Elevator extends Thread {
 		this.elevator_id = id;
 		elevatorSubSystem = new ElevatorSubsystem(id,num_floor);
 		try {
-			sendSocket = new DatagramSocket(port);
+			receiveSocket = new DatagramSocket(port);
 		} catch (SocketException se) {
 			se.printStackTrace();
 			System.exit(1);
@@ -177,6 +177,7 @@ public class Elevator extends Thread {
 		elevator1 = new Elevator(1100,1,6);
 		elevator2 = new Elevator(1101,2,6);
 		
+		System.out.println("Elevator Start");
 		elevator1.start();
 		elevator2.start();
 	}
