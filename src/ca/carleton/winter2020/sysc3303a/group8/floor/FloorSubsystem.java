@@ -25,7 +25,7 @@ import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
  * */
 
 public class FloorSubsystem {
-    public static final Path INPUT_FILE = Paths.get("../input.txt"); 
+    public static final Path INPUT_FILE = Paths.get("misc/input.txt"); 
     
     private static final String SCHEDULER_HOSTNAME = "localhost";
     private static final int SCHEDULER_PORT = 1000;
@@ -51,8 +51,9 @@ public class FloorSubsystem {
         
         floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
         for(int i = bottomFloor; i <= topFloor; i++) {
-                floors.add(new Floor(this, i, CAR_COUNT, INITIAL_FLOOR));
-                floors.get(i).setDirecionLamp(DEFAULT_DIRECTION);
+                Floor newFloor = new Floor(this, i, CAR_COUNT, INITIAL_FLOOR);
+                newFloor.setDirecionLamp(DEFAULT_DIRECTION);
+                floors.add(newFloor);
         }
         
         try {
@@ -60,6 +61,10 @@ public class FloorSubsystem {
         } catch (SocketException e) {
             System.exit(1);
         }
+    }
+    
+    private Floor getFloor(int floorNum) {
+    	return floors.get(floorNum - BOTTOM_FLOOR);
     }
     
     private byte[] createBuf(Command header, byte[] content) {
@@ -103,8 +108,8 @@ public class FloorSubsystem {
             System.exit(1);
         }
         
-        floors.get(floorNum).setDirecionLamp(direction);
-        floors.get(floorNum).detectArrive();
+        getFloor(floorNum).setDirecionLamp(direction);
+        getFloor(floorNum).detectArrive();
     }
     
     public void respondRequest() {
