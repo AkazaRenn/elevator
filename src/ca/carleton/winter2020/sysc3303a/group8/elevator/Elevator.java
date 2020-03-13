@@ -39,9 +39,10 @@ public class Elevator extends Thread {
 	private static int send = 0;
 	
 	public Elevator(int port, int id, int num_floor) {
-		this.elevator_id = id;
+		elevator_id = id;
 		elevatorSubSystem = new ElevatorSubsystem(id,num_floor);
 		try {
+			sendSocket = new DatagramSocket();
 			receiveSocket = new DatagramSocket(port);
 		} catch (SocketException se) {
 			se.printStackTrace();
@@ -165,8 +166,87 @@ public class Elevator extends Thread {
 				
 				break;
 			case ACK:
-				break;
+				System.out.println("ack");
+				/*----- ACK packet received -----*/
+				switch (msg[1]) {
+				case UP_PICKUP:	
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved UP, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort()); 		// send elevator location
+					status = 1;				
+					break;		// end UP_PICKUP
+
+				case DOWN_PICKUP:
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved DOWN, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort()); 
+					status = 1;
+					break;		// end DOWN_PICKUP
+
+				case UP_DROPOFF:
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved UP, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					status = 0;
+					break;		// end UP_DROPOFF
+
+				case DOWN_DROPOFF:
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved DOWN, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					status = 0;		// elevator job drop off
+					break;		// end DOWN_DROPOFF
+					
+				
+				}// end CMD switch
+				
+				/*--- send elevator location message ---*/
+				try {
+					sendSocket.send(sendPacket);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					System.exit(1);
+				}
+				
+				break;		// end ACK
+			
 			case DATA:
+				System.out.println("data");
+				/*----- DATA packet received -----*/
+				switch (msg[1]) {
+				case UP_PICKUP:
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved UP, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					status = 1;							// elevator job pick up
+					send = 1;
+					break;
+
+				case DOWN_PICKUP:
+					sendPacket = createPacket(DATA, Integer.toString(elevatorSubSystem.getCurrentFloor()),receivePacket.getPort());
+					System.out.println("ELEVATOR " + elevator_id + ": Elevator moved DOWN, now at Floor " + elevatorSubSystem.getCurrentFloor());
+					status = 1;							// elevator job pick up
+					send = 1;
+					break;
+
+				case STOP:
+					status = 1;							// elevator job pick up
+					send = 0;
+					break;				
+				}// end CMD switch
+					
+				/*--- send ACK message ---*/
+				ackPacket = createPacket(ACK, msg[1], receivePacket.getPort());
+				try {
+					sendSocket.send(ackPacket);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				    System.exit(1);
+				}
+				/*--- send elevator location ---*/
+				if (send == 1) {
+					try {
+						sendSocket.send(sendPacket);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						System.exit(1);
+					}
+				}// end update location
 				break;
 			}
 		}
@@ -174,8 +254,8 @@ public class Elevator extends Thread {
 	
 
 	public static void main(String[] args) {
-		elevator1 = new Elevator(1100,1,6);
-		elevator2 = new Elevator(1101,2,6);
+		elevator1 = new Elevator(1100,1,20);
+		elevator2 = new Elevator(1101,2,20);
 		
 		System.out.println("Elevator Start");
 		elevator1.start();

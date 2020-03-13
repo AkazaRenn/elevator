@@ -82,7 +82,7 @@ public class Floor {
     
     public void buttonPressed(FloorButton button) {
 //        setDirecionLamp(button.getDirection());
-        FLOORSYS.setStop(button.getDirection(),FLOOR_NUM);
+        //FLOORSYS.setStop(button.getDirection(),FLOOR_NUM);
     }
     
     public void detectArrive() {
