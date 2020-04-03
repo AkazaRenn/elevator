@@ -2,6 +2,10 @@
 
 [GitHub Page](https://github.com/AkazaRenn/elevator)
 
+## Execution
+
+Add the project into Eclipse, run the packages IN ORDER OF elevator, scheduler, floor
+
 ## Files Descriptions
 
 ### README.md

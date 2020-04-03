@@ -8,10 +8,10 @@ import Scheduler.*;
 import junit.framework.*;
 
 public class SchedulerTest extends TestCase{
-	private Scheduler s;
+	private SchedulerSubsystem s;
 	
 	public void setUp() throws Exception {
-		s = new Scheduler();
+		s = new SchedulerSubsystem();
 		
 	}
 

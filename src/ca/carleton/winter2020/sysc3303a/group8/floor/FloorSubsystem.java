@@ -3,268 +3,146 @@ package ca.carleton.winter2020.sysc3303a.group8.floor;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ca.carleton.winter2020.sysc3303a.group8.utils.Command;
-import ca.carleton.winter2020.sysc3303a.group8.utils.Direction;
+import ca.carleton.winter2020.sysc3303a.group8.utils.Utils;
 
-/** FloorSubsystem.java
- * This class is the FloorSubsystem side for a simple echo server based on UDP/IP. 
- * The FloorSubsystem sends a character string to the echo server, 
- * then waits for the server to send it back to the Floor Subsystem.
+/**
+ * FloorSubsystem.java This class is the FloorSubsystem side for a simple echo
+ * server based on UDP/IP. The FloorSubsystem sends a character string to the
+ * echo server, then waits for the server to send it back to the Floor
+ * Subsystem.
+ * 
  * @author Zhi Qiao and Dennis Liu
  * @author Frank Xu
- * */
+ */
 
 public class FloorSubsystem {
 
-	DatagramPacket sendPacket;
-	DatagramPacket receivePacket;
-	DatagramSocket floorSocket;
-	/* ## HEADER AND COMMAND IDENTIFIERS ## */
-	final int ACK = 1;
-	final int CMD = 2;
-	final int DATA = 3;
-	final int ERROR = 0;
+    private DatagramSocket socket;
+    private List<Floor> floors;
 
-	final int FLOORPORT = 1200;					// port of floor subsystem
-	final int SCHEDPORT = 1000;					// port of scheduler
-	
-	 public int BOTTOM_FLOOR;
-	 public int TOP_FLOOR;
-	 private int ELEVATOR_COUNT;
-	
-	int floorMin = 0;
-	int floorTotal = 22;
-	int elevatorTotal = 4;
-	
-	Direction currentDirection = Direction.HOLD;
-	int requestCount = 0;
-	
-	ArrayList<Floor> floors = new ArrayList<Floor>();	
+    private boolean running;
 
-	public FloorSubsystem() {
-			
-        try {
-        	floorSocket = new DatagramSocket(FLOORPORT);
-        } catch (SocketException se) {
-            se.printStackTrace();
-            System.exit(1);
-        }
-		
-	}
-	
-	public void createFloors(int bottomFloor, int topFloor, int carNum) {
-		BOTTOM_FLOOR = bottomFloor;
-        TOP_FLOOR = topFloor;
-        ELEVATOR_COUNT = carNum;
-        
-        floors = new ArrayList<Floor>(topFloor - bottomFloor + 1);
-        for(int i = bottomFloor; i <= topFloor; i++) {
-                Floor newFloor = new Floor(this, i, carNum, 1);
-                newFloor.setDirecionLamp(Direction.HOLD);
-                floors.add(newFloor);
-        }
-	}
-			
-			
-
-	/**
-	 * Places string in a byte array for sending
-	 * 
-	 * @param packetType, ins
-	 * @param byte array of data
-	 */
-	public byte[] createPacketData(int packetType, String ins) {
-		
-		String data;
-		
-		// error
-		if (packetType == 0) {			
-			data = "\0" + ERROR + "\0" + ins + "\0";					
-		}
-		// ack
-		else if (packetType == 1) {			
-			data = "\0" + ACK + "\0" + ins + "\0";
-		}
-		// cmd
-		else if (packetType == 2) {
-			data = "\0" + CMD + "\0" + ins + "\0";
-		}
-		// data
-		else {
-			data = "\0" + DATA + "\0" + ins + "\0";
-		}		
-		
-		return data.getBytes();
-	}	
-
-	/**
-	 * Converts byte array into string array using default charset.
-	 * data[0] is the header, data[1] is the data or command (ex "0x10")
-	 * 
-	 * @param msg
-	 * @return str
-	 */
-	public String[] readPacketData(byte[] msg) {
-		// Converts byte array into string array using default charset.
-		// data[0] is the header, data[1] is the data or command (ex "0x10")
-		String data = new String(msg);
-		String[] str;
-		str = data.replaceFirst("\0", "").split("\0");
-		
-		return str;
-	}
-	
-
-	/**
-	 * Set a datagram packet and block until message is received
-	 * 
-	 * @param socket, msg
-	 * @return packet
-	 */
-	public DatagramPacket receive(DatagramSocket socket, byte[] msg) {
-		DatagramPacket packet = new DatagramPacket(msg, msg.length);
-
-		// Block until a datagram packet is received
-		try {
-			socket.receive(packet);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return packet;
-	}
-
-
-	/**
-	 * Create a service request to send to the scheduler, setting lamps as necessary
-	 * 
-	 * @param start, dest, direction
-	 * @return msg
-	 */
-	public byte[] createServiceRequest(String time, int start, int dest, Direction direction) {
-		
-		byte msg[] = new byte[100];
-		String message = time + " " + start + " " + direction + " " + dest;
-		msg = createPacketData(DATA, message);
-		
-		System.out.println("Floor Subsystem: Sending elevator request to go from floor " + 
-								start + " to " + dest + ", heading " + direction + ". Turning direction lamp on.");
-		 
-		return msg;
-	}	
-
-	/**
-	 * Create and send a message
-	 * 
-	 * @param msg, port
-	 * 
-	 */
-	public void send(byte[] msg, int port, DatagramSocket socket) {
-		
-		//create a service request message
-		try {
-	        sendPacket = new DatagramPacket(msg, msg.length,
-	                                        InetAddress.getLocalHost(), port);
-	     } catch (UnknownHostException e) {
-	        e.printStackTrace();
-	        System.exit(1);
-	     }
-		 
-		//send the service request message
-		try {
-	        socket.send(sendPacket);
-
-	     } catch (IOException e) {
-	        e.printStackTrace();
-	        System.exit(1);
-	     }
-		 //System.out.println("Floor Subsystem: Sending ");
-		 System.out.println(String.format("Floor Subsystem: Sending packet ( string >> %s, byte array >> %s ).", 
-				 new String(sendPacket.getData()), sendPacket.getData()));
-		 
-		
-	}
-	
-
-	/**
-	 * Send a service request containing the start floor, destination floor and target direction
-	 * 
-	 * @param start, dest, dir
-	 * 
-	 */
-	public void sendServiceRequest(String time, int start, int dest, Direction dir, DatagramSocket socket) {
-		
-		byte[] buffer = new byte[100];
-		byte[] response = new byte[100];
-		String[] msg = new String[2];
-		String[] data = new String[2];
-		String[] acknowledgment = new String[2];
-		buffer = createPacketData(CMD, "0x10");
-		send(buffer, SCHEDPORT, socket);
-		System.out.println("Floor Subsystem: Requesting to send elevator input. Waiting for acknowledgment...");
-//		Block until acknowledgment message is received
-		receive(socket, buffer);
-		msg = readPacketData(buffer);
-		if (Integer.parseInt(msg[0]) == ACK) {
-			if (msg[1].equals("0x10")) {
-				System.out.println("Floor Subsystem: CMD acknowledgment received. Sending input to Scheduler");
-				response = createServiceRequest(time, start, dest, dir);
-				send(response, SCHEDPORT, socket);
-				System.out.println("Floor Subsystem: Waiting for acknowledgment of data packet...");
-//				Block until acknowledgment message is received
-				receive(socket, buffer);
-				data = readPacketData(buffer);
-				acknowledgment = readPacketData(response);
-				System.out.println("Floor Subsystem: Data packet acknowledged. Scheduler data is: " + data[1]);
-			}
-		}
-	}
-	
-	/**
-	 * Listen for messages sent from the scheduler
-	 * 
-	 * @param ins
-	 * @param request
-	 */
-	public void running() {
-		boolean listening = true;
-		byte[] buffer = new byte[100];
-		String[] data = new String[2];
-		int tempPort = 0;
-		
-		while (listening) {
-			try {
-//				Block until Scheduler starts exchange signaling elevator has arrived
-				tempPort = receive(floorSocket, buffer).getPort();
-				data = readPacketData(buffer);
-				if (Integer.parseInt(data[0]) == CMD) {
-					//cmdRequest(data, tempPort);
-					
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				listening = false;
-			}
-		}
-	}	
-
-
-    public static void main(String[] args) throws Throwable {
-    	FloorSubsystem system = new FloorSubsystem();
-    	system.createFloors(1, 20, 2);
-		Thread inputHandler;
-		inputHandler = new Thread(new UserInputHandler(system), "User Input Handler");
-		inputHandler.start();
-		system.running();
+    public FloorSubsystem(String name) {
+        socket = Utils.newSocket(Utils.FLOOR_PORT);
+        floors = new ArrayList<Floor>();
     }
+
+    public void main() {
+        running = true;
+        byte[] bytes = new byte[100];
+        String[] data = new String[2];
+
+        while (running) {
+            DatagramPacket packet = Utils.recvPacket(socket, bytes);
+            data = Utils.parseData(bytes);
+            if (Integer.parseInt(data[0]) == Command.CMD.getCommandCode()) {
+                respondArrival(data, packet.getPort());
+            }
+        }
+    }
+
+    /**
+     * Build a request byte array
+     * @param time time of the request sent
+     * @param reqFloor floor the request is received
+     * @param tgtFloor floor the request targets to
+     * @param direction direction of the movement
+     * @return a request byte array built from the params
+     */
+    private byte[] buildRequest(String time, int reqFloor, int tgtFloor, Command direction) {
+        if (direction == Command.UP) {
+            floors.get(reqFloor).setUpLamp(true);
+        } else if (direction == Command.DOWN) {
+            floors.get(reqFloor).setDownLamp(true);
+        }
+        System.out.println(
+                "Floor: got request from floor " + reqFloor + " to " + tgtFloor + ", " + direction + " lamp on.");
+        return Utils.buildData(Command.DATA, time + " " + reqFloor + " " + direction + " " + tgtFloor);
+    }
+
+    /**
+     * Send a request of elevator to the scheduler
+     * @param time time of the request sent
+     * @param reqFloor floor the request is received
+     * @param tgtFloor floor the request targets to
+     * @param direction direction of the movement
+     */
+    public void request(String time, int reqFloor, int tgtFloor, Command direction) {
+        Utils.sendPacket(socket, Utils.buildData(Command.CMD, Command.FLOOR_BUTTON.getCommandCode()),
+                Utils.SCHEDULER_HOSTNAME, Utils.SCHEDULER_PORT);
+        System.out.println("Floor: sent request for an elevator, pending response...");
+
+        byte[] data = new byte[100];
+        Utils.recvPacket(socket, data);
+        String[] msg = Utils.parseData(data);
+        if (Command.valueOfCode(msg[0]) == Command.ACK) {
+            if (msg[1].equals(String.valueOf(Command.FLOOR_BUTTON.getCommandCode()))) {
+                System.out.println("Floor: ACK received.");
+                data = buildRequest(time, reqFloor, tgtFloor, direction);
+                Utils.sendPacket(socket, data, Utils.SCHEDULER_HOSTNAME, Utils.SCHEDULER_PORT);
+                System.out.println("Floor: sent input to Scheduler, pending response...");
+                Utils.recvPacket(socket, data);
+                msg = Utils.parseData(data);
+                System.out.println("Floor: ACK received. Scheduler data: " + msg[1]);
+            }
+        }
+    }
+
+    /**
+     * Send a respond of an incoming elevator arrival signal
+     * @param msg the message received
+     * @param port port of the scheduler, used for responding
+     */
+    private void respondArrival(String[] msg, int port) {
+        byte[] bytes = new byte[100];
+        if (Integer.parseInt(msg[0]) == Command.CMD.getCommandCode()) {
+            if (Command.valueOfCode(msg[1]) == Command.ELEVATOR_ARRIVED) {
+                System.out.println("Floor: elevator arrival received.");
+                Utils.sendPacket(socket, Utils.buildData(Command.ACK, Command.ELEVATOR_ARRIVED.getCommandCode()),
+                        Utils.SCHEDULER_HOSTNAME, port);
+                System.out.println("Floor: sent ACK, pending floor number...");
+                Utils.recvPacket(socket, bytes);
+                String[] data = Utils.parseData(bytes);
+                int floorNum = Integer.parseInt(data[1]);
+                if (floors.get(floorNum).getUpLamp()) {
+                    floors.get(floorNum).setUpLamp(false);
+                } else if (floors.get(floorNum).getDownLamp()) {
+                    floors.get(floorNum).setDownLamp(false);
+                }
+                System.out.println("Floor: floor number received.");
+                Utils.sendPacket(socket, Utils.buildData(Command.ACK, data[1]), Utils.SCHEDULER_HOSTNAME, port);
+                System.out.println("Floor: sent ACK.");
+            }
+        }
+    }
+
+    public boolean addFloor(Floor floor) {
+        return floors.add(floor);
+    }
+
+    public List<Floor> getFloors() {
+        return floors;
+    }
+
+    public void stopRunning() {
+        running = false;
+    }
+
+    public static void main(String args[]) throws IOException {
+        FloorSubsystem floorSubsystem = new FloorSubsystem("floor");
+        Thread input = new FloorButtons(floorSubsystem, "input");
+
+        for (int i = 0; i < Utils.FLOOR_COUNT; i++) {
+            floorSubsystem.addFloor(new Floor(1, i + 1));
+        }
+
+        System.out.println("Starting Floor Subsystem.");
+        input.start();
+        floorSubsystem.main();
+    }
+
 }

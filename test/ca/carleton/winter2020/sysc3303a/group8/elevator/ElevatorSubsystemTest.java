@@ -8,14 +8,14 @@ import ElevatorSystem.*;
 import junit.framework.*;
 
 public class ElevatorTest extends TestCase{
-	private Elevator e;
+	private Car e;
 	private ElevatorDirection direction;
 	private ElevatorStatus status;
 	private ElevatorControl control;
 
 	public void setUp() throws Exception {
 		
-		e = new Elevator("4", direction.E_UP);
+		e = new Car("4", direction.E_UP);
 		control = new ElevatorControl(5000, 3, "4");
 	}
 	
@@ -28,7 +28,7 @@ public class ElevatorTest extends TestCase{
 		assertEquals("4", e.getCurrentFloor());
 		assertEquals(4, e.getIntFloor());
 		assertEquals(ElevatorDirection.E_UP, e.getDirection());
-		Elevator e2 = new Elevator("4", direction.E_HOLD); //creating second elevator object
+		Car e2 = new Car("4", direction.E_HOLD); //creating second elevator object
 		assertEquals(ElevatorStatus.E_IN_USE, e.getStatus());
 		assertEquals(4, control.toInt("4"));
 	}

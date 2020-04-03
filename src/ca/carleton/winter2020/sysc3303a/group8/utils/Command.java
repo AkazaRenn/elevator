@@ -1,29 +1,43 @@
 package ca.carleton.winter2020.sysc3303a.group8.utils;
 
 public enum Command {
-    ACK((byte)0x01),
-    CMD((byte)0x02),
-    DATA((byte)0x03),
-    ERROR((byte)0x04),
-    FLOOR_BUTTON((byte)0x10),
-    ELEVATOR_ARRIVED((byte)0x11),
-    UP_PICKUP((byte)0x33),
-    UP_DROPOFF((byte)0x32),
-    DOWN_PICKUP((byte)0x31),
-    DOWN_DROPOFF((byte)0x30),
-    DOOR_OPEN((byte)0x3A),
-    DOOR_CLOSE((byte)0x3B),
-    STOP((byte)0x3C),
-    ERROR_DOOR_JAM((byte)0xE0),
-    ERROR_STUCK((byte)0xE1);
+    ACK(1),
+    CMD(2),
+    DATA(3),
+    ERROR(0),
     
-    private byte commandByte;
+    FLOOR_BUTTON(10),
+    ELEVATOR_ARRIVED(11),
+    DOOR_OPEN(12),
+    DOOR_CLOSE(13),
     
-    private Command(byte commandByte) {
-        this.commandByte = commandByte;
+    UP(20),
+    DOWN(21),
+    STOP(22),
+    
+    ERROR_DOOR_JAM(999),
+    ERROR_STUCK(998);
+    
+    private int commandCode;
+    
+    private Command(int commandCode) {
+        this.commandCode = commandCode;
     }
 
-    public byte getCommandByte() {
-        return commandByte;
+    public int getCommandCode() {
+        return commandCode;
+    }
+    
+    public static Command valueOfCode(int commandCode) {
+        for (Command c : values()) {
+            if (c.commandCode == commandCode) {
+                return c;
+            }
+        }
+        return null;
+    }
+    
+    public static Command valueOfCode(String commandCode) {
+        return valueOfCode(Integer.parseInt(commandCode));
     }
 }

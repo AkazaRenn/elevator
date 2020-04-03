@@ -13,12 +13,12 @@ import junit.framework.*;
 public class FloorTest extends TestCase{
 	private Floor floor;
 	private FloorSubsystem fs;
-	private UserInputHandler uih;
+	private FloorButtons uih;
 	
 	public void setUp() throws Exception {
 		floor = new Floor(3, 4, true, false);
 		fs = new FloorSubsystem();
-		uih = new UserInputHandler(fs);
+		uih = new FloorButtons(fs);
 	}
 
 	public void tearDown() throws Exception {
@@ -30,7 +30,7 @@ public class FloorTest extends TestCase{
 		int floorNo = 4;
 		int numElev = 3;
 		assertEquals(floorNo, floor.getFloorNum());
-		assertEquals(numElev, floor.getElevNum());
+		assertEquals(numElev, floor.getCarCount());
 	}
 	
 
@@ -38,7 +38,7 @@ public class FloorTest extends TestCase{
 		String ins = "3";
 		String data = "\0" + 1 + "\0" + ins + "\0";
 		byte[] dataB = data.getBytes();
-		assertEquals(dataB, fs.createPacketData(1, "3"));
+		assertEquals(dataB, fs.buildData(1, "3"));
 	}
 	
 	
@@ -46,7 +46,7 @@ public class FloorTest extends TestCase{
 		String a = "Group 4";
 		byte b[] = a.getBytes();
 		String ans[] = {"Group 4"};
-		assertEquals(ans, fs.readPacketData(b));
+		assertEquals(ans, fs.parseMsg(b));
 		
 		String s = "Group4";
 		byte msg[] = s.getBytes();
